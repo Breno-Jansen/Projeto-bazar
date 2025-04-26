@@ -53,8 +53,9 @@ def cadastro_usuario():
     print ('O usuário precisa terminar com @gmail.com ou @ufrpe.br')
     while True:
         email_cd = input ('Usuário: ').strip()
+        email_arroba = email_cd.split('@')
         # Restrição de e-mails para o usuário
-        if ('@ufrpe.br' in email_cd) or ('@gmail.com' in email_cd):
+        if (email_arroba.count) == 1 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
             os.system('cls')
             print('Usuário valido')
             return email_cd
@@ -125,6 +126,4 @@ def main():
     menu_inicial()
 
 if __name__ == '__main__':
-    main()
-    
-
+    main()    
