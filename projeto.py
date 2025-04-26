@@ -3,7 +3,7 @@ import time
 
 
 def menu_inicial():
-    print('Escolha uma opção: \n1. Cadastro \n2. Login')
+    print('Para entrar no Bazar escolha uma opção: \n1. Cadastro \n2. Login')
     opcao_inicial = input('Digite o respectivo número: ')
     if opcao_inicial == '1':
         cadastrar()
@@ -33,13 +33,12 @@ def efetuar_login():
             
     # Senha:
     while True:
-        print('Login: Sua senha tem 8 caractéries')
+        print('Login: Sua senha tem 8 caracteres')
         senha_log = input('Senha: ').strip()
         
         # Se a senha for a mesma da linha do usuario no banco de dados
         if senha_log in line and len(senha_log) == 8:
             os.system('cls')
-            print('LOGIN EFETIVADO')
             menu_principal()
             return senha_log
             
@@ -65,16 +64,15 @@ def cadastro_usuario():
 
 def cadastro_senha():
     while True:
-        print('Sua senha precisa ter 8 caractéries')
+        print('Sua senha precisa ter 8 caracteres')
         senha_cd = input('Senha: ').strip()
         
         # Restrições da senha
         if len(senha_cd) != 8:
             os.system('cls')
-            print('senha inválida. Sua senha precisa ter 8 caractéries')
+            print('senha inválida.')
         else:
             os.system('cls')
-            print('LOGIN EFETIVADO')
             return senha_cd
 
 
@@ -91,7 +89,7 @@ def login_usuario():
             return email_log
         else:
             os.system('cls')
-            print('Usuário inválido. Esse e-mail não está cadastrado')
+            print('Usuário inválido ou esse e-mail não está cadastrado')
     
         
 
@@ -99,10 +97,10 @@ def login_usuario():
 
 
 def menu_principal():
-    print(f'🇧‌ 🇪‌ 🇲‌  🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌  🇦‌ 🇴‌  🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌')
+    print(f'🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌')
     # Exibir opções da página
-    print ('1. Acessar produtos a venda  \n2. Adicionar produto \n3. Configurações \n0. Sair ')
-    resposta = input ('Digite o número para continuar ou sair: ')
+    print ('\n1. Acessar produtos à venda  \n2. Adicionar produto \n3. Configurações \nX. Sair')
+    resposta = input ('\nDigite o número da opção desejada: ')
     if resposta == '1':
         os.system('cls')
         print('Produtos disponíveis')
