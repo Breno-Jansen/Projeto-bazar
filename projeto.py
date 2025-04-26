@@ -15,7 +15,7 @@ def cadastrar():
     os.system('cls')
     email_cd = cadastro_usuario()
     senha_cd = cadastro_senha()
-
+    # Escrever todos os cadastros no bancodedados.txt
     with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
         arquivo.write(f'{email_cd}, {senha_cd}\n')
     menu_principal()
@@ -24,20 +24,22 @@ def efetuar_login():
     os.system('cls')
     # Login de usuario:
     usuario = login_usuario()
-    # Achando a linha do usuario no banco de dados
+    # Achando a linha do usuario no banco de dados (arquivo .txt)
     with open('bancodedados.txt', 'r') as arquivo:
         lines = arquivo.readlines()
+    # Iterando pelas linhas do txt
     for line in lines:
-        if line.find(usuario) != -1:
+        # Parar quando encontrar a linha do usuario no arquivo
+        if usuario in line:
             break            
             
-    # Senha:
+    # Login da senha:
     while True:
         print('Login: Sua senha tem 8 caracteres')
         senha_log = input('Senha: ').strip()
-        
         # Se a senha for a mesma da linha do usuario no banco de dados
-        if senha_log in line and len(senha_log) == 8:
+        
+        if line.endswith(f'{senha_log}\n'):
             os.system('cls')
             menu_principal()
             return senha_log
@@ -53,7 +55,7 @@ def cadastro_usuario():
     while True:
         email_cd = input ('Usuário: ').strip()
         email_arroba = email_cd.split('@')
-        # Restrição de e-mails para o usuário
+        # Restrição de e-mails para o usuário: @ e terminar com entradas válidas
         if (email_arroba.count) == 1 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
             os.system('cls')
             print('Usuário valido')
@@ -67,7 +69,7 @@ def cadastro_senha():
         print('Sua senha precisa ter 8 caracteres')
         senha_cd = input('Senha: ').strip()
         
-        # Restrições da senha
+        # Restrição do tamanho da senha
         if len(senha_cd) != 8:
             os.system('cls')
             print('senha inválida.')
@@ -81,19 +83,17 @@ def login_usuario():
         print('Login: digite seu e-mail:')
         email_log = input('Usuário: ')
 
+        # Checar se o usuário está presente no arquivo
         with open('bancodedados.txt', 'r') as arquivo:
             txt = arquivo.read()
-
         if email_log in txt:
             print('Usuário valido')
             return email_log
+        
         else:
             os.system('cls')
             print('Usuário inválido ou esse e-mail não está cadastrado')
     
-        
-
-
 
 
 def menu_principal():
@@ -111,6 +111,7 @@ def menu_principal():
         os.system('cls')
         print('Configurações da conta')
     else:
+        # Animação da saídado terminal
         os.system('cls')
         print("Encerrando Programa\nLimpando a tela em:")
         for i in range(3, 0, -1):
