@@ -53,12 +53,12 @@ def cadastro_usuario():
     print ('Cadastro : digite o usuário (e-mail)')
     print ('O usuário precisa terminar com @gmail.com ou @ufrpe.br')
     while True:
-        email_cd = input ('Usuário: ').strip()
+        email_cd = input ('Usuário: ').strip().lower()
         email_arroba = email_cd.split('@')
         # Restrição de e-mails para o usuário: @ e terminar com entradas válidas
-        if (email_arroba.count) == 1 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
+        if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
             os.system('cls')
-            print('Usuário valido')
+            print('Usuário válido')
             return email_cd
         else:
             os.system('cls')
@@ -74,8 +74,15 @@ def cadastro_senha():
             os.system('cls')
             print('senha inválida.')
         else:
+            senha_2 = input ('Repita a senha: ').strip()
+        if senha_cd == senha_2:
+            print('Senha cadastrada!') 
             os.system('cls')
             return senha_cd
+        else:
+            print('As senhas precisam ser idênticas.')
+            os.system('cls') 
+            
 
 
 def login_usuario():
@@ -125,4 +132,4 @@ def main():
     menu_inicial()
 
 if __name__ == '__main__':
-    main()    
+    main()  
