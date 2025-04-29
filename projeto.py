@@ -73,6 +73,7 @@ def cadastro_senha():
         if len(senha_cd) != 8:
             os.system('cls')
             print('senha inválida.')
+        # Confirmação da senha
         else:
             senha_2 = input ('Repita a senha: ').strip()
         if senha_cd == senha_2:
