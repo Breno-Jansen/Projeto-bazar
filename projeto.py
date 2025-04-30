@@ -73,7 +73,7 @@ def cadastro_senha():
             print('senha inválida.')
         # Confirmação da senha
         else:
-            senha_2 = input ('Repita a senha: ').strip()
+            senha_2 = input ('Confirme a senha: ').strip()
         if senha_cd == senha_2:
             print('Senha cadastrada!') 
             os.system('cls')
