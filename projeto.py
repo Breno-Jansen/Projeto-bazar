@@ -10,7 +10,6 @@ def menu_inicial():
     elif opcao_inicial == '2':
         efetuar_login()
 
-
 def cadastrar():
     os.system('cls')
     email_cd = cadastro_usuario()
@@ -48,7 +47,6 @@ def efetuar_login():
             os.system('cls')
             print('Senha incorreta')
 
-    
 def cadastro_usuario():
     print ('Cadastro : digite o usuário (e-mail)')
     print ('O usuário precisa terminar com @gmail.com ou @ufrpe.br')
@@ -84,8 +82,6 @@ def cadastro_senha():
             print('As senhas precisam ser idênticas.')
             os.system('cls') 
             
-
-
 def login_usuario():
     while True:
         print('Login: digite seu e-mail:')
@@ -97,13 +93,10 @@ def login_usuario():
         if email_log in txt:
             print('Usuário valido')
             return email_log
-        
         else:
             os.system('cls')
             print('Usuário inválido ou esse e-mail não está cadastrado')
     
-
-
 def menu_principal():
     print(f'🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌')
     # Exibir opções da página
@@ -126,7 +119,6 @@ def menu_principal():
             print(f"{i}...")
             time.sleep(1)
         os.system('cls')
-
 
 def main():
     os.system('cls')
