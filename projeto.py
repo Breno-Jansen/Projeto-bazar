@@ -6,52 +6,61 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
     try:
         print(prompt, end = '', flush = True)
         senha = ''
-
+        # Se o sistema for windows
         if os.name == 'nt':
             import msvcrt
             while True:
+                # Captura teclas pressionadas na senha antes do enter
                 char = msvcrt.getch()
+                # Tecla enter
                 if char in {b'\r', b'\n'}:
                     print()
                     break
+                # Tecla backspace
                 elif char == b'\x08':
                     if senha:
                         senha = senha[:-1]
                         print('\b \b', end = '', flush = True)
                 else:
                     try:
+                        # Faz a criptografia da senha com ********
                         senha += char.decode('utf-8')
                         print('*', end = '', flush = True)
                     except UnicodeDecodeError:
                         pass
         else:            
-            import termios
-            import tty  
+            import termios # Sistema Linux
+            import tty # Sistema macOS
             fd  = sys.stdin.fileno()
             old_settings = termios.tcgetattr(fd)
             try:
+                # Captura teclas e armazena antes do enter
                 tty.setraw(fd)
                 while True:
                     char = sys.stdin.read(1)
+                    # Tecla enter
                     if char in ('\n', '\r'):
                         print()
                         break
+                    # Tecla backspace
                     elif char == '\x7f':
                         if senha:
                             senha = senha[:-1]
                             print('\b \b', end = '', flush = True)
                     else:
+                        # Faz a criptografia da senha com ********
                         senha += char
                         print('*', end = '', flush = True)
-            finally:
+            finally: # Restora as configurações do terminal para voltar ao padrão
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return senha
-    except Exception:
+    except Exception: # Se o terminal não suportar a entrada
         print("\n  Falha ao esconder a senha. Digite normalmente.")
         return input(prompt)
 
 def menu_inicial():
     while True:
+        # Exibir opções no Menu
         print('Para entrar no Bazar escolha uma opção: \n1. Cadastro \n2. Login')
         opcao_inicial = input('Digite o respectivo número: ').strip()
         if opcao_inicial == '1':
@@ -91,7 +100,7 @@ def efetuar_login():
                 senha = partes[1].strip()
                 usuarios[email] = senha
 
-    if usuario not in usuarios:
+    if usuario not in usuarios: # Se usuario não tiver no banco de dados
         print('Usuário não encontrado.')
         os.system('cls' if os.name == 'nt' else 'clear')
         return                    
@@ -194,11 +203,13 @@ def menu_principal():
         os.system('cls' if os.name == 'nt' else 'clear')
 
 def comprar_itens():
+    # Exibir opções de compra
     with open('listadeitens.txt', 'r') as arquivo:
         lista_completa = arquivo.read()
     print(f'{lista_completa}')
 
 def lancar_itens():
+    # Capturar detalhes do novo item e armazenar na lista
     novo_item = input('Novo item: ').strip()
     descricao_novo_item = input('Descrição do item: ').strip()
     estado_novo_item = input('De 1 a 5 qual o estado do material? ').strip()
@@ -207,7 +218,7 @@ def lancar_itens():
         arquivo.write(f'{novo_item}, {descricao_novo_item}, Estado (1 a 5): {estado_novo_item}, R${preco_novo_item} \n\n')
     print(f'Item adicionado: {novo_item}')
 
-def main():
+def main(): # Sempre começar pelo Menu Incial
     os.system('cls' if os.name == 'nt' else 'clear')
     menu_inicial()
 
