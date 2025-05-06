@@ -1,6 +1,9 @@
 import os
 import time
 import sys
+import random
+import smtplib # Import para fazer login no meu email
+from email.message import EmailMessage # Função python para mensagem de email
 
 def input_senha(prompt = 'Senha: '): # Senha com asteriscos
     try:
@@ -31,7 +34,7 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
         else:            
             import termios # Sistema Linux
             import tty # Sistema macOS
-            fd  = sys.stdin.fileno()
+            fd  = sys.stdin.fileno() # 
             old_settings = termios.tcgetattr(fd)
             try:
                 # Captura teclas e armazena antes do enter
@@ -73,6 +76,23 @@ def menu_inicial():
             os.system('cls' if os.name == 'nt' else 'clear')
             print('Escolha 1 ou 2')
         
+
+def menu_login():
+    while True:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        opcao_menu_login = input('Escolha uma opção: \n1.Usuario e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
+        if opcao_menu_login == '1':
+            login_usuario()
+            break
+        elif opcao_menu_login == '2':
+            esqueci_senha()
+            break
+        elif opcao_menu_login == '3':
+            opcao_menu_login = False
+            break 
+        else:
+            print('Opção invalida')
+
 def cadastrar():
     os.system('cls' if os.name == 'nt' else 'clear')
     # Cadastro do usuario
@@ -83,19 +103,19 @@ def cadastrar():
     with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
         arquivo.write(f'{email_cd}, {senha_cd}\n')
     # Abrir Menu Principal após cadastro
-    efetuar_login()
-            
-def efetuar_login():
+    efetuar_login(opcao_menu_login=None)
+
+def efetuar_login(opcao_menu_login=None):
     os.system('cls' if os.name == 'nt' else 'clear') # Para limpar qualquer os
     # Login de usuario:
-    usuario = login_usuario()
+    usuario = menu_login()
     # Login do senha:
     # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
     with open('bancodedados.txt', 'r') as arquivo:
         usuarios = {}
         for line in arquivo:
             partes = line.strip().split(',') 
-            if len(partes) == 2:  
+            if len(partes) == 2:   # Separa email da senha
                 email = partes[0].strip()
                 senha = partes[1].strip()
                 usuarios[email] = senha
@@ -106,9 +126,12 @@ def efetuar_login():
         return                    
             
     # Login da senha:
-    while True:
+    while True: 
+        if opcao_menu_login == False:
+            break
+
         print('Login: Sua senha tem 8 caracteres')
-        senha_log = input_senha('Senha: ').strip()
+        senha_log = input_senha('Senha: ').strip() # Chamar criptografia
 
         # Se a senha for a mesma da linha do usuario no banco de dados
         if senha_log == usuarios[usuario]:
@@ -161,7 +184,9 @@ def cadastro_senha():
             else:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print('As senhas precisam ser idênticas.')
-                      
+
+
+
 def login_usuario():
     while True:
         print('Login: digite seu e-mail:')
@@ -177,6 +202,61 @@ def login_usuario():
             os.system('cls' if os.name == 'nt' else 'clear')
             print('Usuário inválido ou esse e-mail não está cadastrado')
     
+def esqueci_senha():
+    while True:
+        print('Login: digite seu e-mail para recuperar senha:')
+        email_log = input('Usuário: ').strip()
+
+        # Checar se o usuário está presente no arquivo
+        with open('bancodedados.txt', 'r') as arquivo:
+            txt = arquivo.read()
+        if email_log in txt:
+            print('Usuário valido')
+            codigo =  random.randint(100000,999999) 
+            enviar_email(email_log,codigo)
+            while True:
+                codigo_input = input('digite o código enviado ao seu email: ')
+                if codigo_input == str(codigo):
+                    print('Código correto. Agora crie uma senha nova')
+                    mudar_senha(email_log)
+                    return codigo_input and email_log
+                
+        else:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print('Usuário inválido ou esse e-mail não está cadastrado')
+
+
+def enviar_email(destinatario, codigo):
+    email_remetente = "brenojaccioly@gmail.com" # Meu email
+    senha_app = "hdygauzqbboamert" # Minha senha de app
+    # Coneúdo do email
+    msg = EmailMessage()
+    msg["Subject"] = "Seu código de verificação"
+    msg["From"] = email_remetente
+    msg["To"] = destinatario
+    msg.set_content(f"Olá! Seu código de verificação é: {codigo}")
+
+    try: # Enviar email
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(email_remetente, senha_app)
+            smtp.send_message(msg)
+        print("Código de verificação enviado para o seu email!")
+    except Exception as e:
+        print("Erro ao enviar email:", e)
+
+def mudar_senha(destinatario):
+    with open('bancodedados.txt', 'r') as arquivo:
+        for line in arquivo:
+            partes = line.strip().split(',') 
+            if len(partes) == 2:   # Separa email da senha
+                email = partes[0].strip()
+                senha = partes[1].strip()
+                if email == str(destinatario):
+                    input('Nova senha: ')
+
+
+
+
 def menu_principal():
     print(f'🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌ 🇺‌ 🇷‌ 🇦‌ 🇱‌‌')
     # Exibir opções da página
