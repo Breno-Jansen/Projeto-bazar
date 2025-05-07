@@ -76,10 +76,11 @@ def menu_inicial():
             os.system('cls' if os.name == 'nt' else 'clear')
             print('Escolha 1 ou 2')
         
+
 def menu_login():
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
-        opcao_menu_login = input('Escolha uma opção: \n1.Usuario e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
+        opcao_menu_login = input('Login: Escolha uma opção: \n1. Usuario e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
         if opcao_menu_login == '1':
             login_usuario()
             break
@@ -184,6 +185,8 @@ def cadastro_senha():
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print('As senhas precisam ser idênticas.')
 
+
+
 def login_usuario():
     while True:
         print('Login: digite seu e-mail:')
@@ -212,7 +215,7 @@ def esqueci_senha():
             codigo =  random.randint(100000,999999) 
             enviar_email(email_log,codigo)
             while True:
-                codigo_input = input('digite o código enviado ao seu email: ')
+                codigo_input = input('digite o código enviado ao seu email: ').strip()
                 if codigo_input == str(codigo):
                     print('Código correto. Agora crie uma senha nova')
                     mudar_senha(email_log)
@@ -221,6 +224,7 @@ def esqueci_senha():
         else:
             os.system('cls' if os.name == 'nt' else 'clear')
             print('Usuário inválido ou esse e-mail não está cadastrado')
+
 
 def enviar_email(destinatario, codigo):
     email_remetente = "brenojaccioly@gmail.com" # Meu email
@@ -241,14 +245,31 @@ def enviar_email(destinatario, codigo):
         print("Erro ao enviar email:", e)
 
 def mudar_senha(destinatario):
-    with open('bancodedados.txt', 'r') as arquivo:
-        for line in arquivo:
-            partes = line.strip().split(',') 
-            if len(partes) == 2:   # Separa email da senha
+    os.system('cls' if os.name == 'nt' else 'clear')
+    senha_nova = input('Nova senha: ').strip()
+
+    # Lê todas as linhas do arquivo
+    with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
+        linhas = arquivo.readlines()
+
+    # Abre o arquivo para escrita e sobrescreve com as alterações
+    with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
+        for linha in linhas:
+            partes = linha.strip().split(',')
+            if len(partes) == 2:
                 email = partes[0].strip()
                 senha = partes[1].strip()
-                if email == str(destinatario):
-                    input('Nova senha: ')
+                if email == destinatario:
+                    # Substitui a senha antiga pela nova
+                    nova_linha = f'{email}, {senha_nova}\n'
+                    arquivo.write(nova_linha)
+                    menu_principal()
+                else:
+                    arquivo.write(linha)
+            else:
+                arquivo.write(linha)
+                print('Erro ao mudar senha')
+
 
 def menu_principal():
     print(f'🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌ 🇺‌ 🇷‌ 🇦‌ 🇱‌‌')
