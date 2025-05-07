@@ -76,7 +76,6 @@ def menu_inicial():
             os.system('cls' if os.name == 'nt' else 'clear')
             print('Escolha 1 ou 2')
         
-
 def menu_login():
     while True:
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -185,8 +184,6 @@ def cadastro_senha():
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print('As senhas precisam ser idênticas.')
 
-
-
 def login_usuario():
     while True:
         print('Login: digite seu e-mail:')
@@ -225,7 +222,6 @@ def esqueci_senha():
             os.system('cls' if os.name == 'nt' else 'clear')
             print('Usuário inválido ou esse e-mail não está cadastrado')
 
-
 def enviar_email(destinatario, codigo):
     email_remetente = "brenojaccioly@gmail.com" # Meu email
     senha_app = "hdygauzqbboamert" # Minha senha de app
@@ -253,9 +249,6 @@ def mudar_senha(destinatario):
                 senha = partes[1].strip()
                 if email == str(destinatario):
                     input('Nova senha: ')
-
-
-
 
 def menu_principal():
     print(f'🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌ 🇺‌ 🇷‌ 🇦‌ 🇱‌‌')
