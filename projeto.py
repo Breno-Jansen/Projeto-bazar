@@ -11,7 +11,7 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
         senha = ''
         # Se o sistema for windows
         if os.name == 'nt':
-            import msvcrt 
+            import msvcrt
             while True:
                 # Captura teclas pressionadas na senha antes do enter
                 char = msvcrt.getch()
@@ -31,9 +31,9 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
                         print('*', end = '', flush = True)
                     except UnicodeDecodeError:
                         pass
-        else: 
-            import termios # Sistema Linux/macOS
-            import tty # Controle da leitura no terminal           
+        else:            
+            import termios # Sistema Linux
+            import tty # Sistema macOS
             fd  = sys.stdin.fileno() # 
             old_settings = termios.tcgetattr(fd)
             try:
@@ -63,39 +63,56 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
 
 def menu_inicial():
     while True:
+        limpar_terminal()
         # Exibir opções no Menu
         print('Para entrar no Bazar escolha uma opção: \n1. Cadastro \n2. Login')
         opcao_inicial = input('Digite o respectivo número: ').strip()
         if opcao_inicial == '1':
-            cadastrar()
+            menu_cadastro()
             break
         elif opcao_inicial == '2':
-            efetuar_login() 
+            menu_login() 
             break 
         else:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             print('Escolha 1 ou 2')
         
+def menu_cadastro():
+    while True:
+        limpar_terminal()
+        # Opções do cadastro, ir para login e voltar
+        opcao_menu_cadastro = input('Login: Escolha uma opção: \n1. Novo usuário e senha \n2. Já tem conta? Volte e façe o login \n3. Voltar ao menu inicial \n').strip()
+        if opcao_menu_cadastro == '1':
+            cadastrar()
+            break
+        elif opcao_menu_cadastro == '2':
+            menu_inicial()
+            break
+        elif opcao_menu_cadastro == '3':
+            menu_inicial()
+            break 
+        else:
+            print('Opção invalida')
 
 def menu_login():
     while True:
+        limpar_terminal()
+        # Opções do login, esqueci senha e voltar
         opcao_menu_login = input('Login: Escolha uma opção: \n1. Usuario e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
-        os.system('cls' if os.name == 'nt' else 'clear')
         if opcao_menu_login == '1':
-            login_usuario()
+            efetuar_login()
             break
         elif opcao_menu_login == '2':
             esqueci_senha()
             break
         elif opcao_menu_login == '3':
-            opcao_menu_login = False
+            menu_inicial()
             break 
         else:
-            print('Opção inválida')
-            return menu_login()
+            print('Opção invalida')
 
 def cadastrar():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    limpar_terminal()
     # Cadastro do usuario
     email_cd = cadastro_usuario()
     # Cadastro da senha
@@ -107,9 +124,9 @@ def cadastrar():
     efetuar_login(opcao_menu_login=None)
 
 def efetuar_login(opcao_menu_login=None):
-    os.system('cls' if os.name == 'nt' else 'clear') # Para limpar qualquer os
+    limpar_terminal() # Para limpar qualquer os
     # Login de usuario:
-    usuario = menu_login()
+    usuario = login_usuario()
     # Login do senha:
     # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
     with open('bancodedados.txt', 'r') as arquivo:
@@ -123,7 +140,8 @@ def efetuar_login(opcao_menu_login=None):
 
     if usuario not in usuarios: # Se usuario não tiver no banco de dados
         print('Usuário não encontrado.')
-        os.system('cls' if os.name == 'nt' else 'clear')                   
+        limpar_terminal()
+        return                    
             
     # Login da senha:
     while True: 
@@ -132,18 +150,15 @@ def efetuar_login(opcao_menu_login=None):
 
         print('Login: Sua senha tem 8 caracteres')
         senha_log = input_senha('Senha: ').strip() # Chamar criptografia
-        if not senha_log: # Enter não quebra o sistema
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print('A senha não pode estar vazia.')
-            continue
+
         # Se a senha for a mesma da linha do usuario no banco de dados
         if senha_log == usuarios[usuario]:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             menu_principal()
             return senha_log
             
         else:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             print('Senha incorreta')
 
 def cadastro_usuario():
@@ -154,18 +169,18 @@ def cadastro_usuario():
         email_arroba = email_cd.split('@')
         # Restrição de e-mails para o usuário: @ e terminar com entradas válidas
         if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             print('Usuário válido')
             with open('bancodedados.txt', 'r') as arquivo:
                 usuarios = arquivo.read()
             if email_cd in usuarios:
-                os.system('cls' if os.name == 'nt' else 'clear')
+                limpar_terminal()
                 print('Usuário já cadastrado')
             else:
-                os.system('cls' if os.name == 'nt' else 'clear')
+                limpar_terminal()
                 return email_cd
         else:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             print('Usuário inválido. E-mails aceitos: @ufrpe.br ou @gmail.com')
 
 def cadastro_senha():
@@ -175,27 +190,26 @@ def cadastro_senha():
         
         # Restrição do tamanho da senha
         if len(senha_cd) != 8:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             print('senha inválida.')
         # Confirmação da senha
         else:
             senha_2 = input_senha('Confirme a senha: ').strip()
             if senha_cd == senha_2:
-                os.system('cls' if os.name == 'nt' else 'clear')
+                limpar_terminal()
                 print('Senha cadastrada!') 
                 return senha_cd
             else:
-                os.system('cls' if os.name == 'nt' else 'clear')
+                limpar_terminal()
                 print('As senhas precisam ser idênticas.')
+
+
 
 def login_usuario():
     while True:
         print('Login: digite seu e-mail:')
         email_log = input('Usuário: ').strip()
-        if not email_log:
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print('O e-mail não pode estar vazio.')
-            continue
+
         # Checar se o usuário está presente no arquivo
         with open('bancodedados.txt', 'r') as arquivo:
             txt = arquivo.read()
@@ -203,20 +217,15 @@ def login_usuario():
             print('Usuário valido')
             return email_log
         else:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             print('Usuário inválido ou esse e-mail não está cadastrado')
-            
     
 def esqueci_senha():
     while True:
-        print('Digite seu e-mail para recuperar senha: ')
-        print('Usuário:', end = '', flush = True) # Não entrar apenas com o enter
-        email_log = input().strip()
+        print('Login: digite seu e-mail para recuperar senha:')
+        email_log = input('Usuário: ').strip()
+
         # Checar se o usuário está presente no arquivo
-        if not email_log:
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print('O e-mail não pode estar vazio.')
-            continue
         with open('bancodedados.txt', 'r') as arquivo:
             txt = arquivo.read()
         if email_log in txt:
@@ -231,8 +240,9 @@ def esqueci_senha():
                     return codigo_input and email_log
                 
         else:
-            os.system('cls' if os.name == 'nt' else 'clear')
+            limpar_terminal()
             print('Usuário inválido ou esse e-mail não está cadastrado')
+
 
 def enviar_email(destinatario, codigo):
     email_remetente = "brenojaccioly@gmail.com" # Meu email
@@ -253,7 +263,7 @@ def enviar_email(destinatario, codigo):
         print("Erro ao enviar email:", e)
 
 def mudar_senha(destinatario):
-    os.system('cls' if os.name == 'nt' else 'clear')
+    limpar_terminal()
     senha_nova = input('Nova senha: ').strip()
 
     # Lê todas as linhas do arquivo
@@ -278,6 +288,9 @@ def mudar_senha(destinatario):
                 arquivo.write(linha)
                 print('Erro ao mudar senha')
 
+def limpar_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 
 def menu_principal():
     print(f'🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌ 🇺‌ 🇷‌ 🇦‌ 🇱‌‌')
@@ -285,24 +298,24 @@ def menu_principal():
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta = input ('\nDigite o número da opção desejada: ').strip()
     if resposta == '1':
-        os.system('cls' if os.name == 'nt' else 'clear')
+        limpar_terminal()
         print('Itens disponíveis')
         comprar_itens()
     elif resposta == '2':
-        os.system('cls' if os.name == 'nt' else 'clear')
+        limpar_terminal()
         print('Adicionar item')
         lancar_itens()
     elif resposta == '3':
-        os.system('cls' if os.name == 'nt' else 'clear')
+        limpar_terminal()
         print('Configurações da conta')
     else:
         # Animação da saída do terminal
-        os.system('cls' if os.name == 'nt' else 'clear')
+        limpar_terminal
         print("Encerrando Programa\nLimpando a tela em:")
         for i in range(3, 0, -1):
             print(f"{i}...")
             time.sleep(1)
-        os.system('cls' if os.name == 'nt' else 'clear')
+        limpar_terminal()
 
 def comprar_itens():
     # Exibir opções de compra
@@ -310,13 +323,6 @@ def comprar_itens():
         lista_completa = arquivo.read()
     print(f'{lista_completa}')
 
-def main(): # Sempre começar pelo Menu Incial
-    os.system('cls' if os.name == 'nt' else 'clear')
-    menu_inicial()
-
-if __name__ == '__main__':
-    main()  
-    
 def lancar_itens():
     # Capturar detalhes do novo item e armazenar na lista
     novo_item = input('Novo item: ').strip()
@@ -326,3 +332,10 @@ def lancar_itens():
     with open('listadeitens.txt', 'a', encoding = 'utf-8') as arquivo:
         arquivo.write(f'{novo_item}, {descricao_novo_item}, Estado (1 a 5): {estado_novo_item}, R${preco_novo_item} \n\n')
     print(f'Item adicionado: {novo_item}')
+
+def main(): # Sempre começar pelo Menu Incial
+    limpar_terminal()
+    menu_inicial()
+
+if __name__ == '__main__':
+    main()  
