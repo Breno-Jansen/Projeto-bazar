@@ -1,7 +1,7 @@
 import os
 import time
 import sys
-import random
+import random # Import que possibilita números randomicos
 import smtplib # Import para fazer login no meu email
 from email.message import EmailMessage # Função python para mensagem de email
 
@@ -33,12 +33,11 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
                         pass
         else:            
             import termios # Sistema Linux
-            import tty # Sistema macOS
-            fd  = sys.stdin.fileno() # 
-            old_settings = termios.tcgetattr(fd)
+            import tty # Sistema MacOS
+            fd  = sys.stdin.fileno() # Possibilita a criptografia da entrada com as bibliotecas Linus e Mac
+            old_settings = termios.tcgetattr(fd) # Salva as configurações do terminal antes da modificação
             try:
-                # Captura teclas e armazena antes do enter
-                tty.setraw(fd)
+                tty.setraw(fd) # Captura teclas e armazena antes do enter
                 while True:
                     char = sys.stdin.read(1)
                     # Tecla enter
@@ -124,10 +123,10 @@ def cadastrar():
     efetuar_login(opcao_menu_login=None)
 
 def efetuar_login(opcao_menu_login=None):
-    limpar_terminal() # Para limpar qualquer os
+    limpar_terminal() 
     # Login de usuario:
     usuario = login_usuario()
-    # Login do senha:
+    # Login da senha:
     # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
     with open('bancodedados.txt', 'r') as arquivo:
         usuarios = {}
@@ -145,9 +144,6 @@ def efetuar_login(opcao_menu_login=None):
             
     # Login da senha:
     while True: 
-        if opcao_menu_login == False:
-            break
-
         print('Login: Sua senha tem 8 caracteres')
         senha_log = input_senha('Senha: ').strip() # Chamar criptografia
 
@@ -171,6 +167,7 @@ def cadastro_usuario():
         if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
             limpar_terminal()
             print('Usuário válido')
+            # Checar se usuário já é cadastrado
             with open('bancodedados.txt', 'r') as arquivo:
                 usuarios = arquivo.read()
             if email_cd in usuarios:
@@ -246,8 +243,8 @@ def esqueci_senha():
 
 def enviar_email(destinatario, codigo):
     email_remetente = "brenojaccioly@gmail.com" # Meu email
-    senha_app = "hdygauzqbboamert" # Minha senha de app
-    # Coneúdo do email
+    senha_app = "hdygauzqbboamert" # Minha senha de app para entrar na conta
+    # Conteúdo do email
     msg = EmailMessage()
     msg["Subject"] = "Seu código de verificação"
     msg["From"] = email_remetente
@@ -260,7 +257,7 @@ def enviar_email(destinatario, codigo):
             smtp.send_message(msg)
         print("Código de verificação enviado para o seu email!")
     except Exception as e:
-        print("Erro ao enviar email:", e)
+        print("Erro ao enviar email, verifique se o email de fato existe:", e)
 
 def mudar_senha(destinatario):
     limpar_terminal()
@@ -273,6 +270,7 @@ def mudar_senha(destinatario):
     # Abre o arquivo para escrita e sobrescreve com as alterações
     with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
         for linha in linhas:
+            # Separa email da senha
             partes = linha.strip().split(',')
             if len(partes) == 2:
                 email = partes[0].strip()
@@ -289,14 +287,16 @@ def mudar_senha(destinatario):
                 print('Erro ao mudar senha')
 
 def limpar_terminal():
+    # Para limpar o terminal em qualquer os
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def menu_principal():
-    print(f'🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌ 🇺‌ 🇷‌ 🇦‌ 🇱‌‌')
+    print(f'============================================\n🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌ 🇺‌ 🇷‌ 🇦‌ 🇱‌‌ \n============================================')
     # Exibir opções da página
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta = input ('\nDigite o número da opção desejada: ').strip()
+
     if resposta == '1':
         limpar_terminal()
         print('Itens disponíveis')
@@ -308,14 +308,17 @@ def menu_principal():
     elif resposta == '3':
         limpar_terminal()
         print('Configurações da conta')
-    else:
+    elif resposta == 'x':
         # Animação da saída do terminal
-        limpar_terminal
+        limpar_terminal()
         print("Encerrando Programa\nLimpando a tela em:")
         for i in range(3, 0, -1):
             print(f"{i}...")
             time.sleep(1)
         limpar_terminal()
+    else:
+        limpar_terminal()
+        menu_principal()
 
 def comprar_itens():
     # Exibir opções de compra
