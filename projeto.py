@@ -97,7 +97,7 @@ def menu_login():
     while True:
         limpar_terminal()
         # Opções do login, esqueci senha e voltar
-        opcao_menu_login = input('Login: Escolha uma opção: \n1. Usuario e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
+        opcao_menu_login = input('Login: Escolha uma opção: \n1. Usuário e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
         if opcao_menu_login == '1':
             efetuar_login()
             break
@@ -108,23 +108,24 @@ def menu_login():
             menu_inicial()
             break 
         else:
-            print('Opção invalida')
+            print('Opção inválida')
 
 def cadastrar():
     limpar_terminal()
-    # Cadastro do usuario
+    nome_cd = cadastro_nome()
+    # Cadastro do usuário
     email_cd = cadastro_usuario()
     # Cadastro da senha
     senha_cd = cadastro_senha()
     # Escrever todos os cadastros no bancodedados.txt
     with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-        arquivo.write(f'{email_cd}, {senha_cd}\n')
+        arquivo.write(f'{nome_cd}, {email_cd}, {senha_cd}\n')
     # Abrir Menu Principal após cadastro
     efetuar_login(opcao_menu_login=None)
 
 def efetuar_login(opcao_menu_login=None):
     limpar_terminal() 
-    # Login de usuario:
+    # Login de usuário:
     usuario = login_usuario()
     # Login da senha:
     # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
@@ -132,14 +133,14 @@ def efetuar_login(opcao_menu_login=None):
         usuarios = {}
         for line in arquivo:
             partes = line.strip().split(',') 
-            if len(partes) == 2:   # Separa email da senha
-                email = partes[0].strip()
-                senha = partes[1].strip()
+            if len(partes) != -1:   # Separa email da senha
+                email = partes[1].strip()
+                senha = partes[2].strip()
                 usuarios[email] = senha
 
-    if usuario not in usuarios: # Se usuario não tiver no banco de dados
-        print('Usuário não encontrado.')
+    if usuario not in usuarios: # Se usuário não tiver no banco de dados
         limpar_terminal()
+        print('Usuário não encontrado.')
         return                    
             
     # Login da senha:
@@ -147,7 +148,7 @@ def efetuar_login(opcao_menu_login=None):
         print('Login: Sua senha tem 8 caracteres')
         senha_log = input_senha('Senha: ').strip() # Chamar criptografia
 
-        # Se a senha for a mesma da linha do usuario no banco de dados
+        # Se a senha for a mesma da linha do usuário no banco de dados
         if senha_log == usuarios[usuario]:
             limpar_terminal()
             menu_principal()
@@ -156,6 +157,19 @@ def efetuar_login(opcao_menu_login=None):
         else:
             limpar_terminal()
             print('Senha incorreta')
+
+def cadastro_nome():
+    print('Digite seu nome')
+    while True:
+        nome_cd = input('Nome: ')
+        # Checar se nome já é cadastrado
+        with open('bancodedados.txt', 'r') as arquivo:
+            usuarios = arquivo.read()
+        if nome_cd in usuarios:
+            print('Esse nome já foi usado')
+        else:
+            limpar_terminal()
+            return nome_cd
 
 def cadastro_usuario():
     print ('Cadastro : digite o usuário (e-mail)')
@@ -292,7 +306,7 @@ def limpar_terminal():
 
 
 def menu_principal():
-    print(f'============================================\n🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇿‌ 🇦‌ 🇷‌ 🇺‌ 🇷‌ 🇦‌ 🇱‌‌ \n============================================')
+    print(f'=================================================,=\n🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇷‌ 🇿‌ 🇦‌ 🇷‌   🇧‌ 🇷‌ 🇪‌ 🇯‌ 🇴 \n- O Bazar/Brechó da ufrpe criado por Breno e João - \n===================================================')
     # Exibir opções da página
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta = input ('\nDigite o número da opção desejada: ').strip()
