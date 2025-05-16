@@ -5,6 +5,7 @@ import random # Import que possibilita números randomicos
 import smtplib # Import para fazer login no meu email
 from email.message import EmailMessage # Função python para mensagem de email
 
+
 def input_senha(prompt = 'Senha: '): # Senha com asteriscos
     try:
         print(prompt, end = '', flush = True)
@@ -161,7 +162,7 @@ def efetuar_login(opcao_menu_login=None):
 def cadastro_nome():
     print('Digite seu nome')
     while True:
-        nome_cd = input('Nome: ')
+        nome_cd = input('Nome: ').strip()
         # Checar se nome já é cadastrado
         with open('bancodedados.txt', 'r') as arquivo:
             usuarios = arquivo.read()
@@ -247,7 +248,7 @@ def esqueci_senha():
                 codigo_input = input('digite o código enviado ao seu email: ').strip()
                 if codigo_input == str(codigo):
                     print('Código correto. Agora crie uma senha nova')
-                    mudar_senha(email_log)
+                    mudar_senha_esqueci(email_log)
                     return codigo_input and email_log
                 
         else:
@@ -273,7 +274,7 @@ def enviar_email(destinatario, codigo):
     except Exception as e:
         print("Erro ao enviar email, verifique se o email de fato existe:", e)
 
-def mudar_senha(destinatario):
+def mudar_senha_esqueci(destinatario):
     limpar_terminal()
     senha_nova = input('Nova senha: ').strip()
 
@@ -305,11 +306,12 @@ def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
+
 def menu_principal():
-    print(f'=================================================,=\n🇧‌ 🇪‌ 🇲‌   🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇷‌ 🇿‌ 🇦‌ 🇷‌   🇧‌ 🇷‌ 🇪‌ 🇯‌ 🇴 \n- O Bazar/Brechó da ufrpe criado por Breno e João - \n===================================================')
+    print(f'================================================,=\n🇧‌ 🇪‌ 🇲‌  🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇷‌ 🇿‌ 🇦‌ 🇷‌   🇧‌ 🇷‌ 🇪‌ 🇯‌ 🇴 \n\n- O Bazar/Brechó da UFRPE criado por BREno e JOão - \n===================================================')
     # Exibir opções da página
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
-    resposta = input ('\nDigite o número da opção desejada: ').strip()
+    resposta = input ('\nDigite a opção desejada: ').strip()
 
     if resposta == '1':
         limpar_terminal()
@@ -321,7 +323,7 @@ def menu_principal():
         lancar_itens()
     elif resposta == '3':
         limpar_terminal()
-        print('Configurações da conta')
+        menu_config()
     elif resposta == 'x':
         # Animação da saída do terminal
         limpar_terminal()
@@ -331,6 +333,7 @@ def menu_principal():
             time.sleep(1)
         limpar_terminal()
     else:
+        print('Opção inválida')
         limpar_terminal()
         menu_principal()
 
@@ -346,9 +349,32 @@ def lancar_itens():
     descricao_novo_item = input('Descrição do item: ').strip()
     estado_novo_item = input('De 1 a 5 qual o estado do material? ').strip()
     preco_novo_item = input('Preço: R$').strip()
+    # Escrever descrições no txt dos itens
     with open('listadeitens.txt', 'a', encoding = 'utf-8') as arquivo:
         arquivo.write(f'{novo_item}, {descricao_novo_item}, Estado (1 a 5): {estado_novo_item}, R${preco_novo_item} \n\n')
     print(f'Item adicionado: {novo_item}')
+
+def menu_config():
+    print('=============\nConfigurações\n=============\n')
+    print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Voltar')
+    resposta = input('\nDigite o número da opção desejada: ').strip()
+    if resposta == '1':
+        limpar_terminal()
+        print('Feedback')
+    elif resposta == '2':
+        limpar_terminal()
+        print('Mudar nome da conta')
+    elif resposta == '3':
+        limpar_terminal()
+        print('Mudar senha da conta')
+    elif resposta == '4':
+        limpar_terminal()
+        menu_principal()
+    else:
+        print('Opção inválida')
+        limpar_terminal()
+        menu_config()
+
 
 def main(): # Sempre começar pelo Menu Incial
     limpar_terminal()
