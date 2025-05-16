@@ -1,5 +1,3 @@
-breno.jansen@ufrpe.br, breno333
-joao@gmail.com, jjjjaaaa
-peres@gmail.com, pppprrrr
-igor@gmail.com, iiiigggg
-heitor@ufrpe.br, hhhhtttt
+Breno Jansen, breno.jansen@ufrpe.br, jansen20
+João Guilherme, jgsa1502@gmail.com, jaoteste
+Breno Accioly, brenojaccioly@gmail.com, breno333
