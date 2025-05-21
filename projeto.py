@@ -120,7 +120,7 @@ def cadastrar():
     senha_cd = cadastro_senha()
     # Escrever todos os cadastros no bancodedados.txt
     with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-        arquivo.write(f'{nome_cd},{email_cd},{senha_cd}\n')
+        arquivo.write(f'{nome_cd},{email_cd},{senha_cd}\n').strip()
     # Abrir Menu Principal após cadastro
     efetuar_login(opcao_menu_login=None)
 
@@ -187,7 +187,7 @@ def cadastro_usuario():
                 usuarios = arquivo.read()
             if email_cd in usuarios:
                 limpar_terminal()
-                print('Usuário já cadastrado')
+                print('Usuário já cadastrado, Insira outro e-mail!')
             else:
                 limpar_terminal()
                 return email_cd
@@ -214,8 +214,6 @@ def cadastro_senha():
             else:
                 limpar_terminal()
                 print('As senhas precisam ser idênticas.')
-
-
 
 def login_usuario():
     while True:
@@ -296,7 +294,7 @@ def mudar_senha_esqueci(destinatario):
             email = partes[1].strip()
             senha = partes[2].strip()
             if email == destinatario:
-                nova_linha = f'{nome},{email},{senha_nova}\n' 
+                nova_linha = f'{nome},{email},{senha_nova}\n'.strip() 
                 nova_lista.append(nova_linha)
                 senha_trocada = True
             else:
@@ -320,10 +318,8 @@ def limpar_terminal():
     # Para limpar o terminal em qualquer os
     os.system('cls' if os.name == 'nt' else 'clear')
 
-
-
 def menu_principal(usuario):
-    print(f'================================================,=\n🇧‌ 🇪‌ 🇲‌  🇻‌ 🇮‌ 🇳‌ 🇩‌ 🇴‌   🇦‌ 🇴‌   🇧‌ 🇦‌ 🇷‌ 🇿‌ 🇦‌ 🇷‌   🇧‌ 🇷‌ 🇪‌ 🇯‌ 🇴 \n\n- O Bazar/Brechó da UFRPE criado por BREno e JOão - \n===================================================')
+    print ('\033[34m=' * 60, f'\n \033[1;35m   ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n    - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m=' * 60)
     # Exibir opções da página
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta_mp = input ('\nDigite a opção desejada: ').strip()
@@ -417,20 +413,14 @@ def excluir_conta(usuario):
                 print(f"{i}...")
                 time.sleep(1)
                 limpar_terminal()
-            print('Conta excluida com sucesso!')
-
-               
-    
+           
     if conta_excluida:
-        print('Conta exluída com sucesso')
+        print('Conta exluída com sucesso!')
     else:
-        print('Erro ao encontrar email')
+        print('Erro ao encontrar email')  
 
-
-                
-                    
     if resposta_ec == '2':
-        limpar_terminal
+        limpar_terminal()
         menu_config()
 
 def main(): # Sempre começar pelo Menu Incial
