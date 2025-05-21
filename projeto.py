@@ -120,7 +120,7 @@ def cadastrar():
     senha_cd = cadastro_senha()
     # Escrever todos os cadastros no bancodedados.txt
     with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-        arquivo.write(f'{nome_cd},{email_cd},{senha_cd}\n').strip()
+        arquivo.write(f'{nome_cd},{email_cd},{senha_cd}\n')
     # Abrir Menu Principal após cadastro
     efetuar_login(opcao_menu_login=None)
 
@@ -319,7 +319,7 @@ def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def menu_principal(usuario):
-    print ('\033[34m=' * 60, f'\n \033[1;35m   ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n    - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m=' * 60)
+    print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
     # Exibir opções da página
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta_mp = input ('\nDigite a opção desejada: ').strip()
@@ -369,25 +369,30 @@ def menu_config(usuario):
     print('=============\nConfigurações\n=============\n')
     print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Voltar')
     resposta_mc = input('\nDigite a opção desejada: ').strip()
-    if resposta_mc == '1':
-        limpar_terminal()
-        print('Feedback')
-    elif resposta_mc == '2':
-        limpar_terminal()
-        print('Mudar nome da conta')
-    elif resposta_mc == '3':
-        limpar_terminal()
-        print('Mudar senha da conta')
-    elif resposta_mc == '4':
-        limpar_terminal()
-        excluir_conta(usuario)
-    elif resposta_mc == '5':
-        limpar_terminal()
-        menu_principal()
-    else:
-        print('Opção inválida')
-        limpar_terminal()
-        menu_config()
+    while True:
+        if resposta_mc == '1':
+            limpar_terminal()
+            print('Feedback')
+            break
+        elif resposta_mc == '2':
+            limpar_terminal()
+            print('Mudar nome da conta')
+            break
+        elif resposta_mc == '3':
+            limpar_terminal()
+            print('Mudar senha da conta')
+            break
+        elif resposta_mc == '4':
+            limpar_terminal()
+            excluir_conta(usuario)
+            break
+        elif resposta_mc == '5':
+            limpar_terminal()
+            menu_principal()
+            break
+        else:
+            print('Opção inválida')
+            limpar_terminal()
 
 def excluir_conta(usuario):
     print('Você realmente deseja excluir sua conta? \n1. Sim \n2. Não, voltar')
@@ -414,14 +419,19 @@ def excluir_conta(usuario):
                 time.sleep(1)
                 limpar_terminal()
            
-    if conta_excluida:
-        print('Conta exluída com sucesso!')
-    else:
-        print('Erro ao encontrar email')  
+        if conta_excluida:
+            print('Conta exluída com sucesso!')
+        else:
+            print('Erro ao encontrar email')  
 
-    if resposta_ec == '2':
+    elif resposta_ec == '2':
         limpar_terminal()
         menu_config()
+    else:
+        limpar_terminal()
+        print('Opção inválida')
+        excluir_conta()
+    
 
 def main(): # Sempre começar pelo Menu Incial
     limpar_terminal()
