@@ -134,7 +134,7 @@ def efetuar_login(opcao_menu_login=None):
         usuarios = {}
         for line in arquivo:
             partes = line.strip().split(',') 
-            if len(partes) != -1:   # Separa email da senha
+            if len(partes) == 3:   # Separa email da senha
                 email = partes[1].strip()
                 senha = partes[2].strip()
                 usuarios[email] = senha
@@ -253,15 +253,14 @@ def esqueci_senha():
             limpar_terminal()
             print('Usuário inválido ou esse e-mail não está cadastrado')
 
-
-def enviar_email(destinatario, codigo):
+def enviar_email(usuario, codigo):
     email_remetente = "brenojaccioly@gmail.com" # Meu email
     senha_app = "hdygauzqbboamert" # Minha senha de app para entrar na conta
     # Conteúdo do email
     msg = EmailMessage()
     msg["Subject"] = "Seu código de verificação"
     msg["From"] = email_remetente
-    msg["To"] = destinatario
+    msg["To"] = usuario
     msg.set_content(f"Olá! Seu código de verificação é: {codigo}")
 
     try: # Enviar email
@@ -273,7 +272,7 @@ def enviar_email(destinatario, codigo):
         print("Erro ao enviar email, verifique se o email de fato existe:", e)
         menu_login()
 
-def mudar_senha_esqueci(destinatario):
+def mudar_senha_esqueci(usuario):
     limpar_terminal()
     print('Código correto')
     senha_nova = input('Nova senha: ').strip()
@@ -293,26 +292,24 @@ def mudar_senha_esqueci(destinatario):
             nome = partes[0].strip()
             email = partes[1].strip()
             senha = partes[2].strip()
-            if email == destinatario:
-                nova_linha = f'{nome},{email},{senha_nova}\n'.strip() 
+            if email == usuario:
+                nova_linha = f'{nome},{email},{senha_nova}\n' 
                 nova_lista.append(nova_linha)
-                senha_trocada = True
+                senha_trocada = True # Confirma alteração
             else:
                 nova_lista.append(linha)
         else:
             nova_lista.append(linha)
 
-    # Só reescreve o arquivo após o loop completo
-    with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
-        arquivo.writelines(nova_lista)
-
     if senha_trocada:
+        # Só reescreve o arquivo após o loop completo
+        with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
+            arquivo.writelines(nova_lista)
         print('Senha atualizada com sucesso!')
-        menu_principal()
+        menu_principal(usuario)
 
     else:
         print('Erro: e-mail não encontrado.')
-
 
 def limpar_terminal():
     # Para limpar o terminal em qualquer os
@@ -323,30 +320,34 @@ def menu_principal(usuario):
     # Exibir opções da página
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta_mp = input ('\nDigite a opção desejada: ').strip()
-
-    if resposta_mp == '1':
-        limpar_terminal()
-        print('Itens disponíveis')
-        comprar_itens()
-    elif resposta_mp == '2':
-        limpar_terminal()
-        print('Adicionar item')
-        lancar_itens()
-    elif resposta_mp == '3':
-        limpar_terminal()
-        menu_config(usuario)
-    elif resposta_mp == 'x':
-        # Animação da saída do terminal
-        limpar_terminal()
-        print("Encerrando Programa\nLimpando a tela em:")
-        for i in range(3, 0, -1):
-            print(f"{i}...")
-            time.sleep(1)
-        limpar_terminal()
-    else:
-        print('Opção inválida')
-        limpar_terminal()
-        menu_principal()
+    while True:
+        if resposta_mp == '1':
+            limpar_terminal()
+            print('Itens disponíveis')
+            comprar_itens()
+            break
+        elif resposta_mp == '2':
+            limpar_terminal()
+            print('Adicionar item')
+            lancar_itens()
+            break
+        elif resposta_mp == '3':
+            limpar_terminal()
+            menu_config(usuario)
+            break
+        elif resposta_mp == 'x':
+            # Animação da saída do terminal
+            limpar_terminal()
+            print("Encerrando Programa\nLimpando a tela em:")
+            for i in range(3, 0, -1):
+                print(f"{i}...")
+                time.sleep(1)
+            limpar_terminal()
+            break
+        else:
+            print('Opção inválida')
+            limpar_terminal()
+            menu_principal(usuario)
 
 def comprar_itens():
     # Exibir opções de compra
@@ -366,10 +367,10 @@ def lancar_itens():
     print(f'Item adicionado: {novo_item}')
 
 def menu_config(usuario):
-    print('=============\nConfigurações\n=============\n')
-    print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Voltar')
-    resposta_mc = input('\nDigite a opção desejada: ').strip()
     while True:
+        print('=============\nConfigurações\n=============\n')
+        print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Voltar')
+        resposta_mc = input('\nDigite a opção desejada: ').strip()
         if resposta_mc == '1':
             limpar_terminal()
             print('Feedback')
@@ -377,10 +378,12 @@ def menu_config(usuario):
         elif resposta_mc == '2':
             limpar_terminal()
             print('Mudar nome da conta')
+            mudar_nome_config(usuario)
             break
         elif resposta_mc == '3':
             limpar_terminal()
             print('Mudar senha da conta')
+            mudar_senha_config(usuario)
             break
         elif resposta_mc == '4':
             limpar_terminal()
@@ -388,50 +391,187 @@ def menu_config(usuario):
             break
         elif resposta_mc == '5':
             limpar_terminal()
-            menu_principal()
+            menu_principal(usuario)
             break
         else:
             print('Opção inválida')
             limpar_terminal()
 
+def mudar_nome_config(usuario):
+    # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
+    with open('bancodedados.txt', 'r') as arquivo:
+        usuarios = {}
+        for line in arquivo:
+            partes = line.strip().split(',') 
+            if len(partes) == 3:
+                nome = partes[0].strip()
+                email = partes[1].strip()
+                senha = partes[2].strip()
+                usuarios[email] = senha
+
+    # confirmação da senha:
+    while True: 
+        print('Digite sua senha atual: Sua senha tem 8 caracteres')
+        senha_cadastrada = input_senha('Sua senha: ').strip()
+
+        # Se a senha for a mesma da linha do usuário no banco de dados
+        if senha_cadastrada == usuarios.get(usuario):
+            limpar_terminal()
+            print('Senha correta')
+            break            
+        else:
+            limpar_terminal()
+            print('Senha incorreta')
+
+    nome_usuario = None
+
+    with open('bancodedados.txt', 'r') as arquivo:
+        for linha in arquivo:
+            partes = linha.strip().split(',')
+            if len(partes) == 3:
+                nome = partes[0].strip()
+                email = partes[1].strip()
+                senha = partes[2].strip()
+                if email == usuario:
+                    nome_usuario = nome
+                    break  # achou a linha do usuario e para
+
+    if nome_usuario:
+        print(f'nome atual: {nome_usuario}')
+    else:
+        print('Erro: usuário não encontrado.')
+
+    nome_novo = input('Novo nome: ')
+    # Lê todas as linhas do arquivo
+    with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
+        linhas = arquivo.readlines()
+
+    nova_lista_nome = []
+    nome_trocado = False
+    for linha in linhas:
+        partes = linha.strip().split(',')
+        if len(partes) == 3:
+            nome = partes[0].strip()
+            email = partes[1].strip()
+            senha = partes[2].strip()
+        
+            if email == usuario:
+                nova_linha = f'{nome_novo},{email},{senha}\n'
+                nova_lista_nome.append(nova_linha)
+                nome_trocado = True
+            else:
+                nova_lista_nome.append(linha)
+        else:
+            nova_lista_nome.append(linha)
+
+    if nome_trocado:
+        with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
+            arquivo.writelines(nova_lista_nome)
+        print('Nome atualizado com sucesso!')
+        menu_principal(usuario)
+    else:
+        print('Erro: e-mail não encontrado.')
+
+    
+
+def mudar_senha_config(usuario):
+    # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
+    with open('bancodedados.txt', 'r') as arquivo:
+        usuarios = {}
+        for line in arquivo:
+            partes = line.strip().split(',') 
+            if len(partes) == 3:   # Separa email da senha
+                email = partes[1].strip()
+                senha = partes[2].strip()
+                usuarios[email] = senha                    
+            
+    # confirmação da senha:
+    while True: 
+        print('Digite sua senha atual: Sua senha tem 8 caracteres')
+        senha_cadastrada = input_senha('Sua senha: ').strip() # Chamar criptografia
+
+        # Se a senha for a mesma da linha do usuário no banco de dados
+        if senha_cadastrada == usuarios[usuario]:
+            limpar_terminal()
+            print('Senha correta')
+            break            
+        else:
+            limpar_terminal()
+            print('Senha incorreta')
+
+    senha_nova = input_senha('Nova senha: ').strip()
+
+    # Lê todas as linhas do arquivo
+    with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
+        linhas = arquivo.readlines()
+
+    nova_lista_senha = []
+
+    # Verifica se foi possível atualizar
+    senha_trocada = False
+
+    for linha in linhas:
+        partes = linha.strip().split(',')
+        if len(partes) == 3:
+            nome = partes[0].strip()
+            email = partes[1].strip()
+            senha = partes[2].strip()
+            if email == usuario:
+                nova_linha = f'{nome},{email},{senha_nova}\n' 
+                nova_lista_senha.append(nova_linha)
+                senha_trocada = True # Confirma alteração
+            else:
+                nova_lista_senha.append(linha)
+        else:
+            nova_lista_senha.append(linha)
+
+    if senha_trocada:
+        # Só reescreve o arquivo após o loop completo
+        with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
+            arquivo.writelines(nova_lista_senha)
+        print('Senha atualizada com sucesso!')
+        menu_principal(usuario)
+    else:
+        print('Erro: e-mail não encontrado.')
+
 def excluir_conta(usuario):
     print('Você realmente deseja excluir sua conta? \n1. Sim \n2. Não, voltar')
     resposta_ec = input('Digite a opção desejada: ')
     conta_excluida = False
+    while True:
+        if resposta_ec == '1':
+        # Lê todas as linhas do arquivo
+            email_excluir = str(usuario)
+            print(email_excluir)
+            with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
+                linhas = arquivo.readlines()
+            
+            nova_lista_conta = [linha for linha in linhas if linha.strip().split(',')[1] != email_excluir]
+            if len(nova_lista_conta) == len(linhas):
+                print('Usuário não encontrado')
+            else:
+                conta_excluida = True
+                with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
+                    arquivo.writelines(nova_lista_conta)
+                print("Excluindo conta\nLimpando a tela em:")
+                for i in range(3, 0, -1):
+                    print(f"{i}...")
+                    time.sleep(1)
+                    limpar_terminal()
+            
+            if conta_excluida:
+                print('Conta exluída com sucesso!')
+            else:
+                print('Erro ao encontrar email')  
+            break
 
-    if resposta_ec == '1':
-    # Lê todas as linhas do arquivo
-        email_excluir = str(usuario)
-        print(email_excluir)
-        with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
-            linhas = arquivo.readlines()
-        
-        nova_lista2 = [linha for linha in linhas if linha.strip().split(',')[1] != email_excluir]
-        if len(nova_lista2) == len(linhas):
-            print('Usuário não encontrado')
+        elif resposta_ec == '2':
+            limpar_terminal()
+            menu_config()
+            break
         else:
-            conta_excluida = True
-            with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
-                arquivo.writelines(nova_lista2)
-            print("Excluindo conta\nLimpando a tela em:")
-            for i in range(3, 0, -1):
-                print(f"{i}...")
-                time.sleep(1)
-                limpar_terminal()
-           
-        if conta_excluida:
-            print('Conta exluída com sucesso!')
-        else:
-            print('Erro ao encontrar email')  
-
-    elif resposta_ec == '2':
-        limpar_terminal()
-        menu_config()
-    else:
-        limpar_terminal()
-        print('Opção inválida')
-        excluir_conta()
-    
+            limpar_terminal()
+            print('Opção inválida')    
 
 def main(): # Sempre começar pelo Menu Incial
     limpar_terminal()
