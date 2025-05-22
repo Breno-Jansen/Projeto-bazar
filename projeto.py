@@ -4,6 +4,9 @@ import sys
 import random # Import que possibilita números randomicos
 import smtplib # Import para fazer login no meu email
 from email.message import EmailMessage # Função python para mensagem de email
+import email.mime.text
+import email.mime.multipart
+from prompt_toolkit import prompt
 
 
 def input_senha(prompt = 'Senha: '): # Senha com asteriscos
@@ -36,7 +39,7 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
             import termios # Sistema Linux
             import tty # Sistema MacOS
             fd  = sys.stdin.fileno() # Possibilita a criptografia da entrada com as bibliotecas Linus e Mac
-            old_settings = termios.tcgetattr(fd) # Salva as configurações do terminal antes da modificação
+            config_antiga = termios.tcgetattr(fd) # Salva as configurações do terminal antes da modificação
             try:
                 tty.setraw(fd) # Captura teclas e armazena antes do enter
                 while True:
@@ -55,7 +58,7 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
                         senha += char
                         print('*', end = '', flush = True)
             finally: # Restora as configurações do terminal para voltar ao padrão
-                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                termios.tcsetattr(fd, termios.TCSADRAIN, config_antiga)
         return senha
     except Exception: # Se o terminal não suportar a entrada
         print("\n  Falha ao esconder a senha. Digite normalmente.")
@@ -347,7 +350,7 @@ def menu_principal(usuario):
         else:
             print('Opção inválida')
             limpar_terminal()
-            menu_principal(usuario)
+            menu_principal(usuario)         
 
 def comprar_itens():
     # Exibir opções de compra
@@ -374,6 +377,7 @@ def menu_config(usuario):
         if resposta_mc == '1':
             limpar_terminal()
             print('Feedback')
+            feedback(usuario)
             break
         elif resposta_mc == '2':
             limpar_terminal()
@@ -396,6 +400,44 @@ def menu_config(usuario):
         else:
             print('Opção inválida')
             limpar_terminal()
+            
+def feedback(usuario): 
+
+    email_destinatario = 'joao.soaresaraujo@ufrpe.br' # meu e-mail
+    email_remetente = 'brenojaccioly@gmail.com' # e-mail colaborador
+    senha = 'hdygauzqbboamert'
+    
+
+    while True:
+        # Escrever mensagem
+        feed_mensagem = input('Escreva seu feedback: ').strip()
+        print('1.Editar Feedback\n2.Enviar')
+        editar = input('Digite a opção: ') 
+        if editar == '1': # Editar e-mail
+            print('Vamos editar')
+            feed_mensagem_inicial = print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
+            continue
+        if editar == '2': # Criar e enviar e-mail
+            limpar_terminal()
+            feedback = email.mime.multipart.MIMEMultipart()
+            feedback['From'] = email_remetente
+            feedback['To'] = email_destinatario 
+            feedback['Subject'] = 'Mensagem enviada dos Feedbacks BAZAR' # Título na caixa de entrada
+            feedback.attach(email.mime.text.MIMEText(feed_mensagem, 'plain'))
+        
+        # Enviar e-mail
+            try:
+                with smtplib.SMTP('smtp.gmail.com', 587) as servidor:
+                    servidor.starttls()
+                    servidor.login(email_remetente, senha)
+                    servidor.send_message(feedback)
+                    print('Enviado com sucesso!')
+                    return menu_config(usuario)
+            except Exception:
+                print('Erro ao enviar feedback')
+            break 
+        else:
+            print('Opção Inválida!')   
 
 def mudar_nome_config(usuario):
     # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
