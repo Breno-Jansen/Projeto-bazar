@@ -4,9 +4,8 @@ import sys
 import random # Import que possibilita números randomicos
 import smtplib # Import para fazer login no meu email
 from email.message import EmailMessage # Função python para mensagem de email
-import email.mime.text
-import email.mime.multipart
-from prompt_toolkit import prompt
+from email.mime.multipart import MIMEMultipart # Função para criar uma mensagem de e-mail que pode conter texto ou anexos
+from email.mime.text import MIMEText # Função para criar o conteúdo de texto que será colocado no e-mail
 
 
 def input_senha(prompt = 'Senha: '): # Senha com asteriscos
@@ -320,6 +319,7 @@ def limpar_terminal():
 
 def menu_principal(usuario):
     print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
+    print('\033[m') # Para não ir em todo comando
     # Exibir opções da página
     print ('\n1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta_mp = input ('\nDigite a opção desejada: ').strip()
@@ -403,7 +403,24 @@ def menu_config(usuario):
             
 def feedback(usuario): 
 
-    email_destinatario = 'joao.soaresaraujo@ufrpe.br' # meu e-mail
+    # Achar e-mail do usuario
+    email_feedback = None
+    with open('bancodedados.txt', 'r') as arquivo:
+        for linha in arquivo:
+            partes = linha.strip().split(',')
+            if len(partes) == 3:
+                nome = partes[0].strip()
+                email = partes[1].strip()
+                senha = partes[2].strip()
+                if email == usuario:
+                    email_feedback = email
+                    break  # achou a linha do e-mail e para
+    if email_feedback is None:
+        print('Erro tentar novamente')
+        return            
+    email_suporte1 = 'joao.soaresaraujo@ufrpe.br' # suporte
+    email_copia_cliente = email_feedback # email cópia do cliente
+    email_suporte2 = 'brenojaccioly@gmail.com' # suporte
     email_remetente = 'brenojaccioly@gmail.com' # e-mail colaborador
     senha = 'hdygauzqbboamert'
     
@@ -415,23 +432,27 @@ def feedback(usuario):
         editar = input('Digite a opção: ') 
         if editar == '1': # Editar e-mail
             print('Vamos editar')
-            feed_mensagem_inicial = print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
+            print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
             continue
         if editar == '2': # Criar e enviar e-mail
             limpar_terminal()
-            feedback = email.mime.multipart.MIMEMultipart()
+            feedback = MIMEMultipart()
             feedback['From'] = email_remetente
-            feedback['To'] = email_destinatario 
+            feedback['To'] = f'{email_suporte1}, {email_copia_cliente}, {email_suporte2}'
             feedback['Subject'] = 'Mensagem enviada dos Feedbacks BAZAR' # Título na caixa de entrada
-            feedback.attach(email.mime.text.MIMEText(feed_mensagem, 'plain'))
+            feedback.attach(MIMEText(feed_mensagem, 'plain'))
         
-        # Enviar e-mail
+        # Enviar e-mail(feedback)
             try:
                 with smtplib.SMTP('smtp.gmail.com', 587) as servidor:
                     servidor.starttls()
                     servidor.login(email_remetente, senha)
                     servidor.send_message(feedback)
-                    print('Enviado com sucesso!')
+                    print('Feedback enviado com sucesso, uma cópia foi enviada ao seu e-mail também.')
+                    for i in range(3, 0, -1):
+                        print(f"{i}...")
+                        time.sleep(1)
+                        limpar_terminal()
                     return menu_config(usuario)
             except Exception:
                 print('Erro ao enviar feedback')
