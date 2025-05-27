@@ -426,7 +426,7 @@ def menu_principal(usuario):
     '''
 
     print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
-    print('\033[m') # Para não ir em todo comando
+    print('\033[m\033[m') # Para não ir em todo comando
     # Exibir opções da página
     print ('1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta_mp = input ('\nDigite a opção desejada: ').strip()
