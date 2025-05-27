@@ -19,59 +19,66 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
         Armazena as teclas digitadas e retorna com '********' no terminal.
         Tenta fazer a criptografia e em caso de erro retorna o input.
     '''
-    try:
-        print(prompt, end = '', flush = True)
-        senha = ''
-        # Se o sistema for windows
-        if os.name == 'nt':
-            import msvcrt
-            while True:
-                # Captura teclas pressionadas na senha antes do enter
-                char = msvcrt.getch()
-                # Tecla enter
-                if char in {b'\r', b'\n'}:
-                    print()
-                    break
-                # Tecla backspace
-                elif char == b'\x08':
-                    if senha:
-                        senha = senha[:-1]
-                        print('\b \b', end = '', flush = True)
-                else:
-                    try:
-                        # Faz a criptografia da senha com ********
-                        senha += char.decode('utf-8')
-                        print('*', end = '', flush = True)
-                    except UnicodeDecodeError:
-                        pass
-        else:            
-            import termios # Sistema Linux
-            import tty # Sistema MacOS
-            fd  = sys.stdin.fileno() # Possibilita a criptografia da entrada com as bibliotecas Linus e Mac
-            config_antiga = termios.tcgetattr(fd) # Salva as configurações do terminal antes da modificação
-            try:
-                tty.setraw(fd) # Captura teclas e armazena antes do enter
+    while True:
+        try:
+            print(prompt, end = '', flush = True)
+            senha = ''
+            # Se o sistema for windows
+            if os.name == 'nt':
+                import msvcrt
                 while True:
-                    char = sys.stdin.read(1)
+                    # Captura teclas pressionadas na senha antes do enter
+                    char = msvcrt.getch()
                     # Tecla enter
-                    if char in ('\n', '\r'):
+                    if char in {b'\r', b'\n'}:
                         print()
                         break
                     # Tecla backspace
-                    elif char == '\x7f':
+                    elif char == b'\x08':
                         if senha:
                             senha = senha[:-1]
                             print('\b \b', end = '', flush = True)
                     else:
-                        # Faz a criptografia da senha com ********
-                        senha += char
-                        print('*', end = '', flush = True)
-            finally: # Restora as configurações do terminal para voltar ao padrão
-                termios.tcsetattr(fd, termios.TCSADRAIN, config_antiga)
-        return senha
-    except Exception: # Se o terminal não suportar a entrada
-        print("\n  Falha ao esconder a senha. Digite normalmente.")
-        return input(prompt)
+                        try:
+                            # Faz a criptografia da senha com ********
+                            senha += char.decode('utf-8')
+                            print('*', end = '', flush = True)
+                        except UnicodeDecodeError:
+                            pass
+            else:            
+                import termios # Sistema Linux
+                import tty # Sistema MacOS
+                fd  = sys.stdin.fileno() # Possibilita a criptografia da entrada com as bibliotecas Linus e Mac
+                config_antiga = termios.tcgetattr(fd) # Salva as configurações do terminal antes da modificação
+                try:
+                    tty.setraw(fd) # Captura teclas e armazena antes do enter
+                    while True:
+                        char = sys.stdin.read(1)
+                        # Tecla enter
+                        if char in ('\n', '\r'):
+                            print()
+                            break
+                        # Tecla backspace
+                        elif char == '\x7f':
+                            if senha:
+                                senha = senha[:-1]
+                                print('\b \b', end = '', flush = True)
+                        else:
+                            # Faz a criptografia da senha com ********
+                            senha += char
+                            print('*', end = '', flush = True)
+                finally: # Restora as configurações do terminal para voltar ao padrão
+                    termios.tcsetattr(fd, termios.TCSADRAIN, config_antiga)
+            # Validação da senha
+                if len(senha) != 8:
+                    limpar_terminal()
+                    print('Senha inválida. Ela deve ter exatamente 8 caracteres.\n')
+                    continue
+                else:
+                    return senha
+        except Exception: # Se o terminal não suportar a entrada
+            print("\n  Falha ao esconder a senha. Digite normalmente.")
+            return input(prompt)
 
 def menu_inicial():
     '''
@@ -266,7 +273,7 @@ def cadastro_senha():
             print('senha inválida.')
         # Confirmação da senha
         else:
-            senha_2 = input_senha('Confirme a senha: ').strip()
+            senha_2 = input_senha('\nConfirme a senha: ').strip()
             if senha_cd == senha_2:
                 limpar_terminal()
                 print('Senha cadastrada!') 
@@ -426,7 +433,7 @@ def menu_principal(usuario):
     '''
 
     print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
-    print('\033[m\033[m') # Para não ir em todo comando
+    print('\033[m') # Para não ir em todo comando
     # Exibir opções da página
     print ('1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta_mp = input ('\nDigite a opção desejada: ').strip()
@@ -729,7 +736,7 @@ def mudar_senha_config(usuario):
             limpar_terminal()
             print('Senha incorreta')
 
-    senha_nova = input_senha('Nova senha: ').strip()
+    senha_nova = input_senha('Nova senha: ')
 
     # Lê todas as linhas do arquivo
     with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
@@ -747,12 +754,17 @@ def mudar_senha_config(usuario):
             nome = partes[0].strip()
             email = partes[1].strip()
             senha = partes[2].strip()
-            if email == usuario:
-                nova_linha = f'{nome},{email},{senha_nova}\n' 
-                nova_lista_senha.append(nova_linha)
-                senha_trocada = True # Confirma alteração
+            # Restrição do tamanho da senha
+            if len(senha) != 8:
+                limpar_terminal()
+                print('senha inválida.')
             else:
-                nova_lista_senha.append(linha)
+                if email == usuario:
+                    nova_linha = f'{nome},{email},{senha_nova}\n' 
+                    nova_lista_senha.append(nova_linha)
+                    senha_trocada = True # Confirma alteração
+                else:
+                    nova_lista_senha.append(linha)
         else:
             nova_lista_senha.append(linha)
 
