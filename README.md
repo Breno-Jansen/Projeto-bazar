@@ -16,32 +16,38 @@ Por enquanto so foram usados imports nativos do python:
 - **import random** 
 - **import smtplib** 
 - **etc.**
-## 👨‍💻 Desenvolvedores 
- - **João Guilherme Soares de Araujo:** aluno do 1º período de BSI - UFRPE
- - **Breno Jansen Accyoli:** aluno do 1º período de BSI - UFRPE
 ## 🚀 Começando
-
-Essas instruções permitirão que você obtenha uma cópia do projeto em operação na sua máquina local para fins de desenvolvimento e teste.
-
-
-
-### 🔧 Instalação
-**1.** Clone o repositorio
-- git clone https://github.com/seu-usuario/bazar-brejo.git
-
-## 🖇️ Colaborando
-
+Como funcionalidades no sistema tem:
+#### **CRUD COMPLETO**
+- Cadastrar ou Login
+- Usuário, e-mail e senha;
+- Senha com criptografia;
+- Aceita apenas @gmail.com ou @ufrpe.com;
+- Verificação em dois fatores;
+- Esqueci senha e nova senha;
+- Mudar nome do Usuário;
+- Deletar conta.
+#### **MENUS**
+- Menu Inicial;
+- Menu Principal;
+- Menu Configurações.
+#### **ITENS À VENDA**
+- Mostruário dos itens disponíveis;
+- Nome, descrição, estado e valor do item;
+- Melhorias em breve.
+#### **LANÇAR ITEM**
+- Adicionar um nome ao item;
+- Descrever esse item;
+- Enumerar de 1 a 5 o estado do item;
+- Dar um valor.
+#### **FEEDBACK**
+- Escrever Feedback;
+- Editar;
+- Enviar.
 ## 📄 Licença
 
 Sem licença definida.
 
-## 🎁 Expressões de gratidão
-
-* Conte a outras pessoas sobre este projeto 📢;
-* Convide alguém da equipe para uma cerveja 🍺;
-* Um agradecimento publicamente 🫂;
-* etc.
-
-
----
-⌨️ com ❤️ por [Armstrong Lohãns](https://gist.github.com/lohhans) 😊
+## 👨‍💻 Desenvolvedores 
+ - **João Guilherme Soares de Araujo:** aluno do 1º período de BSI - UFRPE
+ - **Breno Jansen Accyoli:** aluno do 1º período de BSI - UFRPE
