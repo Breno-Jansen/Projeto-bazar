@@ -48,7 +48,7 @@ Como funcionalidades no sistema tem:
 
 Sem licença definida.
 
-## 📎 **LINK**
+## 📎 **Link**
 https://drive.google.com/drive/folders/16iCAubcMO1BJ_iGQd1I340bP0zMBaLtx?usp=drive_link
 
 ## 👨‍💻 Desenvolvedores 
