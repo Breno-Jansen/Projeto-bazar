@@ -43,10 +43,13 @@ Como funcionalidades no sistema tem:
 #### **FEEDBACK**
 - Escrever Feedback;
 - Editar;
-- Enviar.
+- Enviar
 ## 📄 Licença
 
 Sem licença definida.
+
+## 📎 **LINK**
+https://drive.google.com/drive/folders/16iCAubcMO1BJ_iGQd1I340bP0zMBaLtx?usp=drive_link
 
 ## 👨‍💻 Desenvolvedores 
  - **João Guilherme Soares de Araujo:** aluno do 1º período de BSI - UFRPE
