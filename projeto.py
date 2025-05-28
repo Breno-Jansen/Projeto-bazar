@@ -217,6 +217,7 @@ def cadastro_nome():
     print('Digite seu nome')
     while True:
         nome_cd = input('Nome: ').strip()
+        
         # Checar se nome já é cadastrado
         with open('bancodedados.txt', 'r') as arquivo:
             usuarios = arquivo.read()
@@ -224,7 +225,10 @@ def cadastro_nome():
             print('Esse nome já foi usado')
         else:
             limpar_terminal()
-            return nome_cd
+            if all(c.isalpha() or c.isspace() for c in nome_cd):
+                return nome_cd # sai do while
+            else:
+                print('Digite um nome válido (Letras e espaços apenas)')
 
 def cadastro_usuario():
     '''
