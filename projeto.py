@@ -69,13 +69,16 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
                             print('*', end = '', flush = True)
                 finally: # Restora as configurações do terminal para voltar ao padrão
                     termios.tcsetattr(fd, termios.TCSADRAIN, config_antiga)
-            # Validação da senha
-                if len(senha) != 8:
-                    limpar_terminal()
-                    print('Senha inválida. Ela deve ter exatamente 8 caracteres.\n')
-                    continue
-                else:
-                    return senha
+                    
+
+        # Validação da senha            
+            if len(senha) != 8:
+                limpar_terminal()
+                print('Senha inválida. Ela deve ter exatamente 8 caracteres')
+                continue
+            else:
+                return senha
+            
         except Exception: # Se o terminal não suportar a entrada
             print("\n  Falha ao esconder a senha. Digite normalmente.")
             return input(prompt)
@@ -217,7 +220,6 @@ def cadastro_nome():
     print('Digite seu nome')
     while True:
         nome_cd = input('Nome: ').strip()
-        
         # Checar se nome já é cadastrado
         with open('bancodedados.txt', 'r') as arquivo:
             usuarios = arquivo.read()
@@ -225,10 +227,7 @@ def cadastro_nome():
             print('Esse nome já foi usado')
         else:
             limpar_terminal()
-            if all(c.isalpha() or c.isspace() for c in nome_cd):
-                return nome_cd # sai do while
-            else:
-                print('Digite um nome válido (Letras e espaços apenas)')
+            return nome_cd
 
 def cadastro_usuario():
     '''
@@ -277,7 +276,7 @@ def cadastro_senha():
             print('senha inválida.')
         # Confirmação da senha
         else:
-            senha_2 = input_senha('\nConfirme a senha: ').strip()
+            senha_2 = input_senha('Confirme a senha: ').strip()
             if senha_cd == senha_2:
                 limpar_terminal()
                 print('Senha cadastrada!') 
@@ -437,7 +436,7 @@ def menu_principal(usuario):
     '''
 
     print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
-    print('\033[m') # Para não ir em todo comando
+    print('\033[m\033[m') # Para não ir em todo comando
     # Exibir opções da página
     print ('1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
     resposta_mp = input ('\nDigite a opção desejada: ').strip()
@@ -586,11 +585,7 @@ def feedback(usuario):
             feedback['To'] = f'{email_suporte1}, {email_copia_cliente}, {email_suporte2}'
             feedback['Subject'] = 'Mensagem enviada dos Feedbacks BAZAR' # Título na caixa de entrada
             feedback.attach(MIMEText(feed_mensagem, 'plain'))
-        elif editar == '3':
-            limpar_terminal()
-            menu_config()
-        
-        
+    
         # Enviar e-mail(feedback)
             try:
                 with smtplib.SMTP('smtp.gmail.com', 587) as servidor:
@@ -605,7 +600,11 @@ def feedback(usuario):
                     return menu_config(usuario)
             except Exception:
                 print('Erro ao enviar feedback')
-            break 
+            break
+
+        elif editar == '3':
+            limpar_terminal()
+            return menu_config(usuario) 
         else:
             print('Opção Inválida!')   
 
@@ -740,7 +739,7 @@ def mudar_senha_config(usuario):
             limpar_terminal()
             print('Senha incorreta')
 
-    senha_nova = input_senha('Nova senha: ')
+    senha_nova = input_senha('Nova senha: ').strip()
 
     # Lê todas as linhas do arquivo
     with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
@@ -758,17 +757,12 @@ def mudar_senha_config(usuario):
             nome = partes[0].strip()
             email = partes[1].strip()
             senha = partes[2].strip()
-            # Restrição do tamanho da senha
-            if len(senha) != 8:
-                limpar_terminal()
-                print('senha inválida.')
+            if email == usuario:
+                nova_linha = f'{nome},{email},{senha_nova}\n' 
+                nova_lista_senha.append(nova_linha)
+                senha_trocada = True # Confirma alteração
             else:
-                if email == usuario:
-                    nova_linha = f'{nome},{email},{senha_nova}\n' 
-                    nova_lista_senha.append(nova_linha)
-                    senha_trocada = True # Confirma alteração
-                else:
-                    nova_lista_senha.append(linha)
+                nova_lista_senha.append(linha)
         else:
             nova_lista_senha.append(linha)
 
