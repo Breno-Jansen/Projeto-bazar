@@ -48,10 +48,10 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
             else:            
                 import termios # Sistema Linux
                 import tty # Sistema MacOS
-                fd  = sys.stdin.fileno() # Possibilita a criptografia da entrada com as bibliotecas Linus e Mac
-                config_antiga = termios.tcgetattr(fd) # Salva as configurações do terminal antes da modificação
+                sistema  = sys.stdin.fileno() # Possibilita a criptografia da entrada com as bibliotecas Linus e Mac
+                config_antiga = termios.tcgetattr(sistema) # Salva as configurações do terminal antes da modificação
                 try:
-                    tty.setraw(fd) # Captura teclas e armazena antes do enter
+                    tty.setraw(sistema) # Captura teclas e armazena antes do enter
                     while True:
                         char = sys.stdin.read(1)
                         # Tecla enter
@@ -68,7 +68,7 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
                             senha += char
                             print('*', end = '', flush = True)
                 finally: # Restora as configurações do terminal para voltar ao padrão
-                    termios.tcsetattr(fd, termios.TCSADRAIN, config_antiga)
+                    termios.tcsetattr(sistema, termios.TCSADRAIN, config_antiga)
                     
 
         # Validação da senha            
@@ -444,7 +444,7 @@ def menu_principal(usuario):
         if resposta_mp == '1':
             limpar_terminal()
             print('Itens disponíveis')
-            comprar_itens()
+            comprar_itens(usuario)
             break
         elif resposta_mp == '2':
             limpar_terminal()
@@ -468,15 +468,83 @@ def menu_principal(usuario):
             print('Opção inválida')
             limpar_terminal()
 
-def comprar_itens():
+def comprar_itens(usuario):
     '''
         Mostra outro arquivo txt chamado listadeitens.txt que contém a lista de todos os itens à venda
         Melhorias em breve...
     '''
-    # Exibir opções de compra
-    with open('listadeitens.txt', 'r') as arquivo:
-        lista_completa = arquivo.read()
-    print(f'{lista_completa}')
+    with open('listadeitens.txt', 'r', encoding= 'utf-8') as txt:
+        linhas = txt.readlines() # Lendo as linhas da listadeitens.txt
+    separador = '|'
+    todas_as_numeracoes = []
+    todos_os_itens = []
+    todos_os_precos = []     # Criando o armazenamento dos dados em setores
+    todos_estados = []
+    todas_descricoes = []
+    for linha in linhas:
+        separa_numero = linha.split('.')
+        setor = linha.split('|')     # Organizando cada linha por setor
+        if len(setor) == 5:      # Só lê as linhas que tem 5 setores
+            numero = separa_numero[1]
+            nome_e_numero = setor[0]
+            preco = setor[1]          # Numera cada setor
+            estado = setor[2]
+            descricao = setor[3]
+            todas_as_numeracoes.append(numero)
+            todos_os_itens.append(nome_e_numero)
+            todos_os_precos.append(preco)        # Insere os elementos numa array por setor
+            todos_estados.append(estado)
+            todas_descricoes.append(descricao)
+    
+    for i in range(len(todos_os_itens)):    # Printa todos os itens e seus respectivos preços
+        print(f' {str(todos_os_itens[i]).ljust(35)} {separador.ljust(2)}{todos_os_precos[i]}')
+    print(' .X. Voltar para o menu principal')
+
+        
+    while True: # Possibilita a escolha de um item
+        escolha_item = input('Escolha um produto (numeração dele) ou clique X para voltar: ')
+        if escolha_item == 'x':
+            menu_principal(usuario)           # Opção para sair
+            break
+        elif escolha_item not in todas_as_numeracoes:
+            print('Opção inválida')    # Se a opção for inválida não dá o break
+        else:
+            limpar_terminal()
+            while True: # Detalhes e opções de compra ou troca
+                print(f'Item {todos_os_itens[int(escolha_item)-1]}')
+                print('Mais informações:')
+                print(f'{todas_descricoes[int(escolha_item)-1]}, {todos_estados[int(escolha_item)-1]}, {todos_os_precos[int(escolha_item)-1]}')            
+                opcao_item = input('O que você deseja fazer com o item? \n1. Comprar \n2. Pedir para trocar por outro item \n3. Voltar \nOpção: ')
+                if opcao_item == '1':
+                    limpar_terminal()
+                    while True: # Opção de compra apresenta pix e informa sobre email a ser enviado
+                        print(f'Para comprar o item {todos_os_itens[int(escolha_item)-1]}faça o pix de {todos_os_precos[int(escolha_item)-1]}para o pix: 704.514.384-26')
+                        print('Com a confirmação um email será enviado aos vendedores e com o pagamento você poderá buscar o item :)')
+                        confirmar_compra = input(' Para confirmar digite 1, \n para cancelar digite 2:')
+                        if confirmar_compra == '1':
+                            print('Email enviado! Venha para o Ceagri II para pegar seu item.')
+                            break
+                        elif confirmar_compra == '2':
+                            limpar_terminal()
+                            print('Voltando...')
+                            comprar_itens()
+                            break
+                        else:
+                            limpar_terminal()
+                            print('Opção inválida')
+                    break
+                elif opcao_item == '2': # Para solicitar uma troca envia email para vendedores
+                    break # Em desenvolvimento
+
+                elif opcao_item == '3':
+                    limpar_terminal()
+                    comprar_itens(usuario)
+                    break
+                
+                else:
+                    limpar_terminal()
+                    print('Opção inválida')
+            break
 
 def lancar_itens():
     '''
@@ -490,10 +558,26 @@ def lancar_itens():
     descricao_novo_item = input('Descrição do item: ').strip()
     estado_novo_item = input('De 1 a 5 qual o estado do material? ').strip()
     preco_novo_item = input('Preço: R$').strip()
+
+    with open('listadeitens.txt', 'r', encoding= 'utf-8') as txt:
+        linhas = txt.readlines() # Lendo as linhas da listadeitens.txt
+    numeracoes = []
+    
+    for linha in linhas:
+        setor = linha.split('|')     # Organizando cada linha por setor
+        separador_numeracao = linha.split('.') # Numeração dos itens
+        if len(setor) == 5:      # Só lê as linhas que tem 5 setores
+            numeracao = separador_numeracao[1]
+            numeracoes.append(numeracao)
+    ultima_numeracao = int(numeracoes[-1])      # Verifica quantos itens tem
+    nova_numeracao = str(ultima_numeracao + 1)  # Adiciona numeração do próximo item
+        
+
     # Escrever descrições no txt dos itens
     with open('listadeitens.txt', 'a', encoding = 'utf-8') as arquivo:
-        arquivo.write(f'{novo_item},{descricao_novo_item},Estado (1 a 5): {estado_novo_item},R${preco_novo_item} \n\n')
+        arquivo.write(f'.{nova_numeracao}. {novo_item} | R${preco_novo_item} | Estado (1 a 5): {estado_novo_item} | {descricao_novo_item} | \n\n')
     print(f'Item adicionado: {novo_item}')
+    menu_principal()
 
 def menu_config(usuario):
     '''
