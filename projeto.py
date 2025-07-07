@@ -3,7 +3,6 @@ import time # Import para permitir uso do tempo no terminal
 import sys # Verificar sistema atual
 import random # Import que possibilita números randomicos
 import smtplib # Import para fazer login no meu email
-from email.message import EmailMessage # Função python para mensagem de email
 from email.mime.multipart import MIMEMultipart # Função para criar uma mensagem de e-mail que pode conter texto ou anexos
 from email.mime.text import MIMEText # Função para criar o conteúdo de texto que será colocado no e-mail
 
@@ -322,8 +321,10 @@ def esqueci_senha():
             txt = arquivo.read()
         if email_log in txt:
             print('Usuário valido')
+            print('Enviando email...')
             codigo =  random.randint(100000,999999) 
-            enviar_email(email_log,codigo)
+            conteudo = (f"Olá! Seu código de verificação é: {codigo}")
+            enviar_email(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
             while True:
                 codigo_input = input('digite o código enviado ao seu email: ').strip()
                 if codigo_input == str(codigo):
@@ -337,7 +338,7 @@ def esqueci_senha():
             limpar_terminal()
             print('Usuário inválido ou esse e-mail não está cadastrado')
 
-def enviar_email(usuario, codigo):
+def enviar_email(destinatario1, destinatario2, destinatario3, assunto, conteudo):
     '''
         Aqui o programa envia uma mensagem com o código aleatório para o usuário
         O código  é enviado pelo email brenojaccioly@gmail.com (um dos criadores do Bazar) com a senha_app do google.
@@ -349,19 +350,24 @@ def enviar_email(usuario, codigo):
         Tenta enviar código pela internet, se não conseguir, exibe mensagem de erro e volta ao menu_login().
     '''
     email_remetente = "brenojaccioly@gmail.com" # Meu email
-    senha_app = "hdygauzqbboamert" # Minha senha de app para entrar na conta
+    senha_app = "hdygauzqbboamert" 
     # Conteúdo do email
-    msg = EmailMessage()
-    msg["Subject"] = "Seu código de verificação"
+    msg = MIMEMultipart()
+    msg["Subject"] = f"{assunto}"
     msg["From"] = email_remetente
-    msg["To"] = usuario
-    msg.set_content(f"Olá! Seu código de verificação é: {codigo}")
-
+    if destinatario2 == None and destinatario3 == None:
+        msg['To'] = f'{destinatario1}'
+    elif destinatario3 == None:
+        msg["To"] = f'{destinatario1}, {destinatario2}'     # Definindo a quantidade de destinatários
+    else:
+        msg["To"] = f'{destinatario1}, {destinatario2}, {destinatario3}'
+    msg.attach(MIMEText(conteudo, 'plain'))
+    
     try: # Enviar email
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
             smtp.login(email_remetente, senha_app)
             smtp.send_message(msg)
-        print("Código de verificação enviado para o seu email!")
+        print("Email enviado com sucesso!")
     except Exception as e:
         print("Erro ao enviar email, verifique acesso à internet ou se o email de fato existe:", e)
         menu_login()
@@ -378,7 +384,7 @@ def mudar_senha_esqueci(usuario):
     '''
     limpar_terminal()
     print('Código correto')
-    senha_nova = input('Nova senha: ').strip()
+    senha_nova = input_senha('Nova senha: ').strip()
 
     # Lê todas as linhas do arquivo
     with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
@@ -514,7 +520,7 @@ def comprar_itens(usuario):
                 print(f'Item {todos_os_itens[int(escolha_item)-1]}')
                 print('Mais informações:')
                 print(f'{todas_descricoes[int(escolha_item)-1]}, {todos_estados[int(escolha_item)-1]}, {todos_os_precos[int(escolha_item)-1]}')            
-                opcao_item = input('O que você deseja fazer com o item? \n1. Comprar \n2. Pedir para trocar por outro item \n3. Voltar \nOpção: ')
+                opcao_item = input('O que você deseja fazer com o item? \n1. Comprar \n2. Negociar com o vendedor \n3. Voltar \nOpção: ')
                 if opcao_item == '1':
                     limpar_terminal()
                     while True: # Opção de compra apresenta pix e informa sobre email a ser enviado
@@ -534,6 +540,7 @@ def comprar_itens(usuario):
                             print('Opção inválida')
                     break
                 elif opcao_item == '2': # Para solicitar uma troca envia email para vendedores
+                    negociar(usuario)
                     break # Em desenvolvimento
 
                 elif opcao_item == '3':
@@ -545,6 +552,48 @@ def comprar_itens(usuario):
                     limpar_terminal()
                     print('Opção inválida')
             break
+
+def negociar(usuario):
+    print('Para negociar com o cliente você pode conversar com ele por email ou ver o número de telefone dele.')
+    print('1. Escrever email aqui para o vendedor.\n2. Ver o contato do vendedor. \n3. Voltar')
+    assunto = 'Um cliente do Bazar Brejó quer negociar com você!'
+    while True:
+        opcao_ngc = input('Escolha uma opção: ')
+        if opcao_ngc == '1':
+            while True:
+                mensagem_ngc = input('Mensagem para o vendedor: ')
+                print('1. Editar Feedback\n2. Enviar\n3. Cancelar')
+                editar = input('Digite a opção: ') 
+                if editar == '1': # Editar e-mail
+                    print('Vamos editar')
+                    print('Mensagem atual: ', mensagem_ngc) # Continua o texto para edição
+                    continue
+                elif editar == '2': # Criar e enviar e-mail
+                    limpar_terminal()
+                    print('Enviando email...')
+                    try:
+                        # EM DESENVOLVIMENTO, o segundo destinatario vai ser o vendedor do item
+                        enviar_email(usuario, 'jgsa1502@gmail.com', None, assunto, mensagem_ngc) 
+                        print('Mensagem enviada! Uma cópia foi enviada ao seu e-mail também.')
+                    except Exception:
+                        print('Erro ao enviar mensagem')
+                    break
+                elif editar == '3':
+                    limpar_terminal()
+                    return menu_config(usuario) 
+                else:
+                    print('Opção Inválida!')
+            break
+        elif opcao_ngc == '2':
+            limpar_terminal
+            print(f'Número de telefone do vendedor: ')
+            break
+        elif opcao_ngc == '3':
+            limpar_terminal()
+            menu_principal(usuario)
+        else:
+            print('Opção Inválida!')
+        
 
 def lancar_itens():
     '''
@@ -637,9 +686,7 @@ def feedback(usuario):
         for linha in arquivo:
             partes = linha.strip().split(',')
             if len(partes) == 3:
-                nome = partes[0].strip()
                 email = partes[1].strip()
-                senha = partes[2].strip()
                 if email == usuario:
                     email_feedback = email
                     break  # achou a linha do e-mail e para
@@ -649,10 +696,7 @@ def feedback(usuario):
     email_suporte1 = 'joao.soaresaraujo@ufrpe.br' # suporte
     email_copia_cliente = email_feedback # email cópia do cliente
     email_suporte2 = 'brenojaccioly@gmail.com' # suporte
-    email_remetente = 'brenojaccioly@gmail.com' # e-mail colaborador
-    senha = 'hdygauzqbboamert'
-    
-
+    assunto = 'Mensagem enviada dos Feedbacks Bazar Brejó'
     while True:
         # Escrever mensagem
         feed_mensagem = input('Escreva seu feedback: ').strip()
@@ -664,24 +708,10 @@ def feedback(usuario):
             continue
         elif editar == '2': # Criar e enviar e-mail
             limpar_terminal()
-            feedback = MIMEMultipart()
-            feedback['From'] = email_remetente
-            feedback['To'] = f'{email_suporte1}, {email_copia_cliente}, {email_suporte2}'
-            feedback['Subject'] = 'Mensagem enviada dos Feedbacks BAZAR' # Título na caixa de entrada
-            feedback.attach(MIMEText(feed_mensagem, 'plain'))
-    
-        # Enviar e-mail(feedback)
+            print('Enviando email...')
             try:
-                with smtplib.SMTP('smtp.gmail.com', 587) as servidor:
-                    servidor.starttls()
-                    servidor.login(email_remetente, senha)
-                    servidor.send_message(feedback)
-                    print('Feedback enviado com sucesso, uma cópia foi enviada ao seu e-mail também.')
-                    for i in range(3, 0, -1):
-                        print(f"{i}...")
-                        time.sleep(1)
-                        limpar_terminal()
-                    return menu_config(usuario)
+                enviar_email(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
+                print('Feedback enviado! Uma cópia foi enviada ao seu e-mail também.')
             except Exception:
                 print('Erro ao enviar feedback')
             break
