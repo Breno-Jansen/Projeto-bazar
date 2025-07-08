@@ -161,9 +161,11 @@ def cadastrar():
     email_cd = cadastro_usuario()
     # Cadastro da senha
     senha_cd = cadastro_senha()
+    # Cadastro do Whatsapp
+    numero_cd = cadastro_numero()
     # Escrever todos os cadastros no bancodedados.txt
     with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-        arquivo.write(f'{nome_cd},{email_cd},{senha_cd}\n')
+        arquivo.write(f'{nome_cd},{email_cd},{senha_cd},{numero_cd}\n')
     # Ir para o login após cadastro
     efetuar_login()
 
@@ -284,6 +286,31 @@ def cadastro_senha():
                 limpar_terminal()
                 print('As senhas precisam ser idênticas.')
 
+def cadastro_numero():
+    '''
+    Fazer a docstring...
+    '''
+
+    print('Deseja cadastrar seu Whatsapp?\n1. Sim\n2. Não')
+    opcao_cd_numero = input('Digite: ')
+    if opcao_cd_numero == '1':
+        while True:
+            print('Digite seu Whatsapp, apenas números!')
+            numero_cd = input('Número: ').strip()
+            # Restricões do tamanho do número. Padrão (81) 912341234
+            if len(numero_cd) != 11:
+                print('Número inválido. Padrão => 81983548906')
+            else:
+                limpar_terminal()
+                print('Número Cadastrado')
+                return numero_cd
+    elif opcao_cd_numero == '2':
+        limpar_terminal
+        return "" # Precisa retornar o vazio.
+    else:
+        print('Opção Inválida! Digite 1 ou 2.')
+        
+    
 def login_usuario():
     '''
         Essa função recebe o email e lê o bancodedados.txt para verificar se o usuário é válido.
@@ -585,9 +612,13 @@ def negociar(usuario):
                     print('Opção Inválida!')
             break
         elif opcao_ngc == '2':
-            limpar_terminal
+            limpar_terminal()    # Em desenvolvimento
             print(f'Número de telefone do vendedor: ')
-            break
+            opcao_nmr_voltar = input('X. para voltar: ').strip().upper()
+            if opcao_nmr_voltar == 'X':
+                menu_principal(usuario)
+            else:
+                print('Opção Inválida!')
         elif opcao_ngc == '3':
             limpar_terminal()
             menu_principal(usuario)
