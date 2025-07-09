@@ -5,6 +5,7 @@ import random # Import que possibilita números randomicos
 import smtplib # Import para fazer login no meu email
 from email.mime.multipart import MIMEMultipart # Função para criar uma mensagem de e-mail que pode conter texto ou anexos
 from email.mime.text import MIMEText # Função para criar o conteúdo de texto que será colocado no e-mail
+from datetime import datetime # Função para usar o datetime.now, registra a data e hora atual
 
 
 def input_senha(prompt = 'Senha: '): # Senha com asteriscos
@@ -555,8 +556,25 @@ def comprar_itens(usuario):
                         print('Com a confirmação um email será enviado aos vendedores e com o pagamento você poderá buscar o item :)')
                         confirmar_compra = input(' Para confirmar digite 1, \n para cancelar digite 2:')
                         if confirmar_compra == '1':
+                            id_usuario = pegar_id_usuario(usuario) # 
+                            nome_produto = todos_os_itens[int(escolha_item)-1] # Ve a lista e ve o item escolhido
+                            preco_bruto = todos_os_precos[int(escolha_item) - 1].strip() # Ve a lista e ve o valor
+                            valor_str = ''.join(c for c in preco_bruto if c.isdigit() or c in ',.') # Mantém apenas números e separadores decimais
+                            valor_str = valor_str.replace(',', '.')
+                            valor = float(valor_str)
+
+                            registrar_venda(id_usuario, nome_produto, valor)
                             print('Email enviado! Venha para o Ceagri II para pegar seu item.')
-                            break
+                            while True:
+                                print('X. para voltar')
+                                voltar_compra = input('Digite: ').strip().upper()
+                                if voltar_compra == 'X':
+                                    limpar_terminal()
+                                    menu_principal(usuario)
+                                    break
+                                else: 
+                                    print('Opção Inválida!')
+                            
                         elif confirmar_compra == '2':
                             limpar_terminal()
                             print('Voltando...')
@@ -670,7 +688,7 @@ def menu_config(usuario):
     '''
     while True:
         print('=============\nConfigurações\n=============\n')
-        print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Voltar')
+        print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Ver extrato\n6. Voltar')
         resposta_mc = input('\nDigite a opção desejada: ').strip()
         if resposta_mc == '1':
             limpar_terminal()
@@ -692,6 +710,15 @@ def menu_config(usuario):
             excluir_conta(usuario)
             break
         elif resposta_mc == '5':
+            limpar_terminal()
+            id_usuario = pegar_id_usuario(usuario)
+            if id_usuario is not None:
+                mostrar_extrato(id_usuario, usuario)
+            else:
+                print('Sem extrato.') # Caso não ache o usuário
+                menu_config(usuario)
+                break
+        elif resposta_mc == '6':
             limpar_terminal()
             menu_principal(usuario)
             break
@@ -972,7 +999,71 @@ def excluir_conta(usuario):
             break
         else:
             limpar_terminal()
-            print('Opção inválida')    
+            print('Opção inválida')
+
+def pegar_id_usuario(email):
+    '''
+    Essa função busca o ID do usuário, que corresponde á linha em que ele aparece no bancodedados.txt.
+    '''
+    with open('bancodedados.txt', 'r', encoding='utf-8') as f:
+        linhas = f.readlines()  
+        for i, linha in enumerate(linhas, start=1):
+            partes = linha.strip().split(',')
+            if len(partes) == 3:
+                _, email_lido, _ = partes
+                if email_lido.strip() == email:
+                    return i
+            
+def registrar_venda(id_usuario, nome_produto, valor):
+
+    '''
+    Essa função salva a compra no extrato.txt
+    '''
+
+    data = datetime.now().strftime('%d-%m-%Y %H:%M') # O metodo datetime.now pega o tempo da operação e strtime faz a formatação dos horarios.
+    nova_entrada = (f'{nome_produto} - R${valor:.2f} ({data})')
+
+    try:
+        with open('extrato.txt', 'r', encoding='utf-8') as f:
+            linhas = f.readlines()
+    except FileNotFoundError:
+        linhas = []
+
+    while len(linhas) < id_usuario:
+        linhas.append('\n')
+
+    linha_atual = linhas[id_usuario - 1].strip()
+    if linha_atual:
+        linha_atual += ', ' + nova_entrada
+    else:
+        linha_atual = nova_entrada
+    
+    linhas[id_usuario - 1] = linha_atual + '\n'
+
+    with open('extrato.txt', 'w', encoding='utf-8') as f:
+        f.writelines(linhas)
+
+def mostrar_extrato(id_usuario, usuario):
+    '''
+    Essa função mostra o extrato do usuário.
+    '''
+    
+    with open('extrato.txt', 'r', encoding='utf-8') as f:
+        linhas = f.readlines() # Lê o estrato.txt
+        if 0 < id_usuario <= len(linhas): # Pega a linha do id_usuario
+            extrato = linhas[id_usuario - 1].strip()
+            print(f'Extrato do usuário {id_usuario}:') # Mostra as compras registradas
+            print(extrato if extrato else 'Nenhum item registrado!')
+        else:
+            print('Usuário ainda não tem extrato')
+    while True:
+        print('X. Voltar')
+        opcap_extrato = input('Digite: ').strip().upper()
+        if opcap_extrato == 'X':
+            limpar_terminal()
+            menu_config(usuario)
+            break
+
 
 def main(): # Sempre começar pelo Menu Incial
     '''
