@@ -1,6 +1,6 @@
 # 🛍️ BAZAR BREJÓ
 
-Bazar Brejó é uma aplicação desenvolvida por João Guilherme e Breno Jansen, alunos do primeiro periodo de BSI da UFRPE.
+Bazar Brejó é uma aplicação desenvolvida por Breno Jansen e João Guilherme, alunos do primeiro periodo de BSI da UFRPE.
 
 Este projeto possui um forte propósito sustentável e socioecômico, promovendo o reuso e a valorização de itens atraves da criação de uma plataforma interativa e acessível.
 
