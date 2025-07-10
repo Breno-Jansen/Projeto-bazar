@@ -6,6 +6,8 @@ import smtplib # Import para fazer login no meu email
 from email.mime.multipart import MIMEMultipart # Função para criar uma mensagem de e-mail que pode conter texto ou anexos
 from email.mime.text import MIMEText # Função para criar o conteúdo de texto que será colocado no e-mail
 
+menu_global = None
+
 
 def input_senha(prompt = 'Senha: '): # Senha com asteriscos
     
@@ -72,7 +74,7 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
 
         # Validação da senha            
             if len(senha) != 8:
-                limpar_terminal()
+                Sistema.limpar_terminal()
                 print('Senha inválida. Ela deve ter exatamente 8 caracteres')
                 continue
             else:
@@ -82,288 +84,7 @@ def input_senha(prompt = 'Senha: '): # Senha com asteriscos
             print("\n  Falha ao esconder a senha. Digite normalmente.")
             return input(prompt)
 
-def menu_inicial():
-    '''
-        A primeira tela do programa é esse menu que contem as opções de Cadastro e Login para acessar o bazar.
-        Essa função é chamada pela main() para sempre começar por aqui.
-        Tem como entrada 1 e 2 que chamam o cadastro e o login respectivamente. 
-        Em caso de uma entrada inválida continua até receber 1 ou 2.
 
-    '''
-    while True:
-        
-        # Exibir opções no Menu
-        print('Para entrar no Bazar escolha uma opção: \n1. Cadastro \n2. Login')
-        opcao_inicial = input('Digite a opção desejada: ').strip()
-        if opcao_inicial == '1':
-            menu_cadastro()
-            break
-        elif opcao_inicial == '2':
-            menu_login() 
-            break 
-        else:
-            limpar_terminal()
-            print('Escolha 1 ou 2')
-        
-def menu_cadastro():
-    '''
-        Similar ao menu inicial, aqui também são exibidas opções para acessar o Bazar: novo usuário ou voltar
-        Recebe as entradas 1, 2 e 3 como opções de cadastrar, voltar para fazer o login e voltar ao menu inicial
-        Em caso de uma entrada inválida continua até receber 1, 2 ou 3.
-    '''
-    while True:
-        limpar_terminal()
-        # Opções do cadastro, ir para login e voltar
-        opcao_menu_cadastro = input('Login: Escolha uma opção: \n1. Novo usuário e senha \n2. Já tem conta? Volte e façe o login \n3. Voltar ao menu inicial \n').strip()
-        if opcao_menu_cadastro == '1':
-            cadastrar()
-            break
-        elif opcao_menu_cadastro == '2':
-            menu_inicial()
-            break
-        elif opcao_menu_cadastro == '3':
-            menu_inicial()
-            break 
-        else:
-            print('Opção invalida')
-
-def menu_login():
-    '''
-        Nesse menu são exibidas opções para acessar o Bazar ou para voltar. 
-        Recebe as entradas 1, 2 e 3 como opções de login, esqueci a senha e voltar ao menu inicial.
-        Em caso de uma entrada inválida continua até receber 1, 2 ou 3.
-    '''
-    while True:
-        limpar_terminal()
-        # Opções do login, esqueci senha e voltar
-        opcao_menu_login = input('Login: Escolha uma opção: \n1. Usuário e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
-        if opcao_menu_login == '1':
-            efetuar_login()
-            break
-        elif opcao_menu_login == '2':
-            esqueci_senha()
-            break
-        elif opcao_menu_login == '3':
-            menu_inicial()
-            break 
-        else:
-            print('Opção inválida')
-
-def cadastrar():
-    '''
-        Aqui é onde o CRUD começa de fato. Essa função recebe as entradas: nome, email e senha.
-        Essas entradas vem de cadastro_nome, cadastro_usuario e cadastro_senha respectivamente.
-        Após receber esses dados, os armazena em um arquivo chamado 'bancodedados.txt' e depois chama o login.
-    '''
-    limpar_terminal()
-    nome_cd = cadastro_nome()
-    # Cadastro do usuário
-    email_cd = cadastro_usuario()
-    # Cadastro da senha
-    senha_cd = cadastro_senha()
-    # Cadastro do Whatsapp
-    numero_cd = cadastro_numero()
-    # Escrever todos os cadastros no bancodedados.txt
-    with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-        arquivo.write(f'{nome_cd},{email_cd},{senha_cd},{numero_cd}\n')
-    # Ir para o login após cadastro
-    efetuar_login()
-
-def efetuar_login():
-    '''
-        Essa função recebe a entrada do usuário pelo login_usuario e o localiza no bancodedados.txt.
-        Após a leitura, o email é separado da senha pelo .split(',').
-        Depois compara a senha com o input senha_log para verificar se a senha está correta.
-        Se o usuário não estiver no banco de dados ele retorna. 
-        Se a senha não for encontrada continua até receber a senha correta.
-    '''
-    limpar_terminal() 
-    # Login de usuário:
-    usuario = login_usuario()
-    # Login da senha:
-    # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
-    with open('bancodedados.txt', 'r') as arquivo:
-        usuarios = {}
-        for line in arquivo:
-            partes = line.strip().split(',') 
-            if len(partes) == 3:   # Separa email da senha
-                email = partes[1].strip()
-                senha = partes[2].strip()
-                usuarios[email] = senha
-
-    if usuario not in usuarios: # Se usuário não tiver no banco de dados
-        limpar_terminal()
-        print('Usuário não encontrado.')
-        return                    
-            
-    # Login da senha:
-    while True: 
-        print('Login: Sua senha tem 8 caracteres')
-        senha_log = input_senha('Senha: ').strip() # Chamar criptografia
-
-        # Se a senha for a mesma da linha do usuário no banco de dados
-        if senha_log == usuarios[usuario]:
-            limpar_terminal()
-            menu_principal(usuario)
-            return senha_log and usuario
-            
-        else:
-            limpar_terminal()
-            print('Senha incorreta')
-
-def cadastro_nome():
-    '''
-        Nessa função o nome do usuario é a entrada que vai ser retornada ao cadastro.
-        Antes de retornar, confere se o nome já está em uso lendo o bancodedados.txt.
-        Se nome já está cadastrado repete o input para nova entrada.
-
-    '''
-    print('Digite seu nome')
-    while True:
-        nome_cd = input('Nome: ').strip()
-        # Checar se nome já é cadastrado
-        with open('bancodedados.txt', 'r') as arquivo:
-            usuarios = arquivo.read()
-        if nome_cd in usuarios:
-            print('Esse nome já foi usado')
-        else:
-            limpar_terminal()
-            return nome_cd
-
-def cadastro_usuario():
-    '''
-        Nessa função o email do usuario é a entrada que vai ser retornada ao cadastro.
-        Restringe a entrada para conter um email válido: @ufrpe.br ou @gmail.com
-        Antes de retornar, confere se o email já está em uso lendo o bancodedados.txt.
-        Se email está inválido continua até receber uma entrada válida.
-        Se email já está cadastrado repete o input para nova entrada.
-    '''
-    print ('Cadastro : digite o usuário (e-mail)')
-    print ('O usuário precisa terminar com @gmail.com ou @ufrpe.br')
-    while True:
-        email_cd = input ('Usuário: ').strip().lower()
-        email_arroba = email_cd.split('@')
-        # Restrição de e-mails para o usuário: @ e terminar com entradas válidas
-        if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
-            limpar_terminal()
-            print('Usuário válido')
-            # Checar se usuário já é cadastrado
-            with open('bancodedados.txt', 'r') as arquivo:
-                usuarios = arquivo.read()
-            if email_cd in usuarios:
-                limpar_terminal()
-                print('Usuário já cadastrado, Insira outro e-mail!')
-            else:
-                limpar_terminal()
-                return email_cd
-        else:
-            limpar_terminal()
-            print('Usuário inválido. E-mails aceitos: @ufrpe.br ou @gmail.com')
-
-def cadastro_senha():
-    '''
-        Aqui recebe-se a entrada da senha do cadastro com confirmação.
-        As restrinções são o tamanho (precisa conter 8 caracteres) e a tecla de espaço.
-        Se a senha não obedecer as restrinções continua até receber uma entrada válida.
-        Se a senha não for a mesma na confirmação repete o input até ter confimação.
-    '''
-    while True:
-        print('Sua senha precisa ter 8 caracteres')
-        senha_cd = input_senha('Senha: ').strip()
-        
-        # Restrição do tamanho da senha
-        if len(senha_cd) != 8:
-            limpar_terminal()
-            print('senha inválida.')
-        # Confirmação da senha
-        else:
-            senha_2 = input_senha('Confirme a senha: ').strip()
-            if senha_cd == senha_2:
-                limpar_terminal()
-                print('Senha cadastrada!') 
-                return senha_cd
-            else:
-                limpar_terminal()
-                print('As senhas precisam ser idênticas.')
-
-def cadastro_numero():
-    '''
-    Fazer a docstring...
-    '''
-
-    print('Deseja cadastrar seu Whatsapp?\n1. Sim\n2. Não')
-    opcao_cd_numero = input('Digite: ')
-    if opcao_cd_numero == '1':
-        while True:
-            print('Digite seu Whatsapp, apenas números!')
-            numero_cd = input('Número: ').strip()
-            # Restricões do tamanho do número. Padrão (81) 912341234
-            if len(numero_cd) != 11:
-                print('Número inválido. Padrão => 81983548906')
-            else:
-                limpar_terminal()
-                print('Número Cadastrado')
-                return numero_cd
-    elif opcao_cd_numero == '2':
-        limpar_terminal
-        return "" # Precisa retornar o vazio.
-    else:
-        print('Opção Inválida! Digite 1 ou 2.')
-        
-    
-def login_usuario():
-    '''
-        Essa função recebe o email e lê o bancodedados.txt para verificar se o usuário é válido.
-        Se o email não estiver no txt repete o input até receber uma entrada válida.
-    '''
-    while True:
-        print('Login: digite seu e-mail:')
-        email_log = input('Usuário: ').strip()
-
-        # Checar se o usuário está presente no arquivo
-        with open('bancodedados.txt', 'r') as arquivo:
-            txt = arquivo.read()
-        if email_log in txt:
-            print('Usuário valido')
-            return email_log
-        else:
-            limpar_terminal()
-            print('Usuário inválido ou esse e-mail não está cadastrado')
-    
-def esqueci_senha():
-    '''
-        Aqui está presente a função que consegue mudar a senha do usuário cadastrado antes do login.
-        Isso é possível porque após confirmar o usuário o código manda um código para o email do usuário.
-        Depois chama as funções enviar_email e mudar_senha_esqueci para a confirmação do código e troca de senha
-        Se o email não estiver no txt, repete o input até receber uma entrada válida.
-        Se o código não estiver correto, repete o input até confirmar o código.
-        
-    '''
-    while True:
-        print('Login: digite seu e-mail para recuperar senha:')
-        email_log = input('Usuário: ').strip()
-
-        # Checar se o usuário está presente no arquivo
-        with open('bancodedados.txt', 'r') as arquivo:
-            txt = arquivo.read()
-        if email_log in txt:
-            print('Usuário valido')
-            print('Enviando email...')
-            codigo =  random.randint(100000,999999) 
-            conteudo = (f"Olá! Seu código de verificação é: {codigo}")
-            enviar_email(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
-            while True:
-                codigo_input = input('digite o código enviado ao seu email: ').strip()
-                if codigo_input == str(codigo):
-                    print('Código correto. Agora crie uma senha nova')
-                    mudar_senha_esqueci(email_log)
-                    return codigo_input and email_log
-                else:
-                    print('Código incorreto')
-                
-        else:
-            limpar_terminal()
-            print('Usuário inválido ou esse e-mail não está cadastrado')
 
 def enviar_email(destinatario1, destinatario2, destinatario3, assunto, conteudo):
     '''
@@ -397,7 +118,7 @@ def enviar_email(destinatario1, destinatario2, destinatario3, assunto, conteudo)
         print("Email enviado com sucesso!")
     except Exception as e:
         print("Erro ao enviar email, verifique acesso à internet ou se o email de fato existe:", e)
-        menu_login()
+        Menu.menu_login()
 
 def mudar_senha_esqueci(usuario):
     '''
@@ -409,7 +130,7 @@ def mudar_senha_esqueci(usuario):
 
         Se a senha não for trocada exibe mensagem de erro e volta para menu inicial.
     '''
-    limpar_terminal()
+    Sistema.limpar_terminal()
     print('Código correto')
     senha_nova = input_senha('Nova senha: ').strip()
 
@@ -442,64 +163,13 @@ def mudar_senha_esqueci(usuario):
         with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
             arquivo.writelines(nova_lista)
         print('Senha atualizada com sucesso!')
-        menu_principal(usuario)
+        menu_global.menu_principal(usuario)
 
     else:
         print('Erro: e-mail não encontrado.')
-        menu_inicial()
+        Menu.menu_inicial()
 
-def limpar_terminal():
-    '''
-        Aqui está a função mais usada do código.
-        Ela limpa o terminal tanto em sistemas Windows quanto Mac e Linux
-    '''
-    # Para limpar o terminal em qualquer os
-    os.system('cls' if os.name == 'nt' else 'clear')
 
-def menu_principal(usuario):
-    '''
-        Este é o principal local de acesso as funcionalidades do Bazar Brejó.
-        Tem 4 opções de entrada para acessar itens à venda, lançar itens, acessar configurações e sair.
-        Possui tambem cores no terminal.
-
-        Parâmetros:
-            usuario (email_log): o email do login_usuario().
-
-        Se a opção for inválida continuar até receber uma entrada válida.
-    '''
-
-    print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
-    print('\033[m\033[m') # Para não ir em todo comando
-    # Exibir opções da página
-    print ('1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
-    resposta_mp = input ('\nDigite a opção desejada: ').strip()
-    while True:
-        if resposta_mp == '1':
-            limpar_terminal()
-            print('Itens disponíveis')
-            comprar_itens(usuario)
-            break
-        elif resposta_mp == '2':
-            limpar_terminal()
-            print('Adicionar item')
-            lancar_itens()
-            break
-        elif resposta_mp == '3':
-            limpar_terminal()
-            menu_config(usuario)
-            break
-        elif resposta_mp == 'x':
-            # Animação da saída do terminal
-            limpar_terminal()
-            print("Encerrando Programa\nLimpando a tela em:")
-            for i in range(3, 0, -1):
-                print(f"{i}...")
-                time.sleep(1)
-            limpar_terminal()
-            break
-        else:
-            print('Opção inválida')
-            limpar_terminal()
 
 def comprar_itens(usuario):
     '''
@@ -537,19 +207,19 @@ def comprar_itens(usuario):
     while True: # Possibilita a escolha de um item
         escolha_item = input('Escolha um produto (numeração dele) ou clique X para voltar: ')
         if escolha_item == 'x':
-            menu_principal(usuario)           # Opção para sair
+            menu_global.menu_principal(usuario)           # Opção para sair
             break
         elif escolha_item not in todas_as_numeracoes:
             print('Opção inválida')    # Se a opção for inválida não dá o break
         else:
-            limpar_terminal()
+            Sistema.limpar_terminal()
             while True: # Detalhes e opções de compra ou troca
                 print(f'Item {todos_os_itens[int(escolha_item)-1]}')
                 print('Mais informações:')
                 print(f'{todas_descricoes[int(escolha_item)-1]}, {todos_estados[int(escolha_item)-1]}, {todos_os_precos[int(escolha_item)-1]}')            
                 opcao_item = input('O que você deseja fazer com o item? \n1. Comprar \n2. Negociar com o vendedor \n3. Voltar \nOpção: ')
                 if opcao_item == '1':
-                    limpar_terminal()
+                    Sistema.limpar_terminal()
                     while True: # Opção de compra apresenta pix e informa sobre email a ser enviado
                         print(f'Para comprar o item {todos_os_itens[int(escolha_item)-1]}faça o pix de {todos_os_precos[int(escolha_item)-1]}para o pix: 704.514.384-26')
                         print('Com a confirmação um email será enviado aos vendedores e com o pagamento você poderá buscar o item :)')
@@ -558,12 +228,12 @@ def comprar_itens(usuario):
                             print('Email enviado! Venha para o Ceagri II para pegar seu item.')
                             break
                         elif confirmar_compra == '2':
-                            limpar_terminal()
+                            Sistema.limpar_terminal()
                             print('Voltando...')
                             comprar_itens()
                             break
                         else:
-                            limpar_terminal()
+                            Sistema.limpar_terminal()
                             print('Opção inválida')
                     break
                 elif opcao_item == '2': # Para solicitar uma troca envia email para vendedores
@@ -571,12 +241,12 @@ def comprar_itens(usuario):
                     break # Em desenvolvimento
 
                 elif opcao_item == '3':
-                    limpar_terminal()
+                    Sistema.limpar_terminal()
                     comprar_itens(usuario)
                     break
                 
                 else:
-                    limpar_terminal()
+                    Sistema.limpar_terminal()
                     print('Opção inválida')
             break
 
@@ -596,7 +266,7 @@ def negociar(usuario):
                     print('Mensagem atual: ', mensagem_ngc) # Continua o texto para edição
                     continue
                 elif editar == '2': # Criar e enviar e-mail
-                    limpar_terminal()
+                    Sistema.limpar_terminal()
                     print('Enviando email...')
                     try:
                         # EM DESENVOLVIMENTO, o segundo destinatario vai ser o vendedor do item
@@ -606,27 +276,29 @@ def negociar(usuario):
                         print('Erro ao enviar mensagem')
                     break
                 elif editar == '3':
-                    limpar_terminal()
-                    return menu_config(usuario) 
+                    Sistema.limpar_terminal()
+                    return menu_global.menu_config(usuario) 
                 else:
                     print('Opção Inválida!')
             break
         elif opcao_ngc == '2':
-            limpar_terminal()    # Em desenvolvimento
+            Sistema.limpar_terminal()    # Em desenvolvimento
             print(f'Número de telefone do vendedor: ')
             opcao_nmr_voltar = input('X. para voltar: ').strip().upper()
             if opcao_nmr_voltar == 'X':
-                menu_principal(usuario)
+                menu_global.menu_principal(usuario)
+                break
             else:
                 print('Opção Inválida!')
         elif opcao_ngc == '3':
-            limpar_terminal()
-            menu_principal(usuario)
+            Sistema.limpar_terminal()
+            menu_global.menu_principal(usuario)
+            break
         else:
             print('Opção Inválida!')
         
 
-def lancar_itens():
+def lancar_itens(usuario):
     '''
         Nessa função existe a possibilidade de lançar itens à listadeitens.txt.
         Para isso é necessário um nome, descrição, estado do item de 1 a 5 e preço.
@@ -657,47 +329,8 @@ def lancar_itens():
     with open('listadeitens.txt', 'a', encoding = 'utf-8') as arquivo:
         arquivo.write(f'.{nova_numeracao}. {novo_item} | R${preco_novo_item} | Estado (1 a 5): {estado_novo_item} | {descricao_novo_item} | \n\n')
     print(f'Item adicionado: {novo_item}')
-    menu_principal()
+    menu_global.menu_principal(usuario)
 
-def menu_config(usuario):
-    '''
-        Aqui são exibidas as opções das configurações como feedback, mudar nome, mudar senha, excluir conta e voltar.
-
-        Parâmetros:
-            usuario (email_log): o email do login_usuario().
-
-        Se a opção for inválida continuar até receber uma entrada válida.
-    '''
-    while True:
-        print('=============\nConfigurações\n=============\n')
-        print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Voltar')
-        resposta_mc = input('\nDigite a opção desejada: ').strip()
-        if resposta_mc == '1':
-            limpar_terminal()
-            print('Feedback')
-            feedback(usuario)
-            break
-        elif resposta_mc == '2':
-            limpar_terminal()
-            print('Mudar nome da conta')
-            mudar_nome_config(usuario)
-            break
-        elif resposta_mc == '3':
-            limpar_terminal()
-            print('Mudar senha da conta')
-            mudar_senha_config(usuario)
-            break
-        elif resposta_mc == '4':
-            limpar_terminal()
-            excluir_conta(usuario)
-            break
-        elif resposta_mc == '5':
-            limpar_terminal()
-            menu_principal(usuario)
-            break
-        else:
-            print('Opção inválida')
-            limpar_terminal()
             
 def feedback(usuario): 
     '''
@@ -738,7 +371,7 @@ def feedback(usuario):
             print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
             continue
         elif editar == '2': # Criar e enviar e-mail
-            limpar_terminal()
+            Sistema.limpar_terminal()
             print('Enviando email...')
             try:
                 enviar_email(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
@@ -748,8 +381,8 @@ def feedback(usuario):
             break
 
         elif editar == '3':
-            limpar_terminal()
-            return menu_config(usuario) 
+            Sistema.limpar_terminal()
+            return menu_global.menu_config(usuario) 
         else:
             print('Opção Inválida!')   
 
@@ -785,11 +418,11 @@ def mudar_nome_config(usuario):
 
         # Se a senha for a mesma da linha do usuário no banco de dados
         if senha_cadastrada == usuarios.get(usuario):
-            limpar_terminal()
+            Sistema.limpar_terminal()
             print('Senha correta')
             break            
         else:
-            limpar_terminal()
+            Sistema.limpar_terminal()
             print('Senha incorreta')
 
     nome_usuario = None
@@ -838,11 +471,11 @@ def mudar_nome_config(usuario):
         with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
             arquivo.writelines(nova_lista_nome)
         print('Nome atualizado com sucesso!')
-        menu_principal(usuario)
+        menu_global.menu_principal(usuario)
     else:
-        limpar_terminal()
+        Sistema.limpar_terminal()
         print('Erro: e-mail não encontrado.')
-        menu_principal(usuario)
+        menu_global.menu_principal(usuario)
 
     
 
@@ -877,11 +510,11 @@ def mudar_senha_config(usuario):
 
         # Se a senha for a mesma da linha do usuário no banco de dados
         if senha_cadastrada == usuarios[usuario]:
-            limpar_terminal()
+            Sistema.limpar_terminal()
             print('Senha correta')
             break            
         else:
-            limpar_terminal()
+            Sistema.limpar_terminal()
             print('Senha incorreta')
 
     senha_nova = input_senha('Nova senha: ').strip()
@@ -916,7 +549,7 @@ def mudar_senha_config(usuario):
         with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
             arquivo.writelines(nova_lista_senha)
         print('Senha atualizada com sucesso!')
-        menu_principal(usuario)
+        menu_global.menu_principal(usuario)
     else:
         print('Erro: e-mail não encontrado.')
 
@@ -932,7 +565,6 @@ def excluir_conta(usuario):
 
         Se não for possível excluir a conta, exibir mensagem de erro e ir para menu_config()
 
-        
     '''
     print('Você realmente deseja excluir sua conta? \n1. Sim \n2. Não, voltar')
     resposta_ec = input('Digite a opção desejada: ')
@@ -957,29 +589,420 @@ def excluir_conta(usuario):
                 for i in range(3, 0, -1):
                     print(f"{i}...")
                     time.sleep(1)
-                    limpar_terminal()
+                    Sistema.limpar_terminal()
             
             if conta_excluida:
                 print('Conta exluída com sucesso!')
             else:
                 print('Erro ao encontrar email. Tente novamente') 
-                menu_config(usuario)
+                menu_global.menu_config(usuario)
             break
 
         elif resposta_ec == '2':
-            limpar_terminal()
-            menu_config(usuario)
+            Sistema.limpar_terminal()
+            menu_global.menu_config(usuario)
             break
         else:
-            limpar_terminal()
+            Sistema.limpar_terminal()
             print('Opção inválida')    
+
+class Menu:
+    def __init__(self, sistema):
+        self.sistema = sistema
+    def menu_inicial(self):
+        '''
+            A primeira tela do programa é esse menu que contem as opções de Cadastro e Login para acessar o bazar.
+            Essa função é chamada pela main() para sempre começar por aqui.
+            Tem como entrada 1 e 2 que chamam o cadastro e o login respectivamente. 
+            Em caso de uma entrada inválida continua até receber 1 ou 2.
+
+        '''
+        while True:
+            Sistema.limpar_terminal()
+            # Exibir opções no Menu
+            print('Para entrar no Bazar escolha uma opção: \n1. Cadastro \n2. Login')
+            opcao_inicial = input('Digite a opção desejada: ').strip()
+            if opcao_inicial == '1':
+                self.menu_cadastro()
+                break
+            elif opcao_inicial == '2':
+                self.menu_login() 
+                break 
+            else:
+                Sistema.limpar_terminal()
+                print('Escolha 1 ou 2')
+
+    def menu_cadastro(self):
+        '''
+            Similar ao menu inicial, aqui também são exibidas opções para acessar o Bazar: novo usuário ou voltar
+            Recebe as entradas 1, 2 e 3 como opções de cadastrar, voltar para fazer o login e voltar ao menu inicial
+            Em caso de uma entrada inválida continua até receber 1, 2 ou 3.
+        '''
+        while True:
+            Sistema.limpar_terminal()
+            # Opções do cadastro, ir para login e voltar
+            opcao_menu_cadastro = input('Login: Escolha uma opção: \n1. Novo usuário e senha \n2. Já tem conta? Volte e façe o login \n3. Voltar ao menu inicial \n').strip()
+            if opcao_menu_cadastro == '1':
+                self.sistema.cadastrar()
+                break
+            elif opcao_menu_cadastro == '2':
+                self.menu_inicial()
+                break
+            elif opcao_menu_cadastro == '3':
+                self.menu_inicial()
+                break 
+            else:
+                print('Opção invalid    a')
+
+    def menu_login(self):
+        '''
+            Nesse menu são exibidas opções para acessar o Bazar ou para voltar. 
+            Recebe as entradas 1, 2 e 3 como opções de login, esqueci a senha e voltar ao menu inicial.
+            Em caso de uma entrada inválida continua até receber 1, 2 ou 3.
+        '''
+        while True:
+            Sistema.limpar_terminal()
+            # Opções do login, esqueci senha e voltar
+            opcao_menu_login = input('Login: Escolha uma opção: \n1. Usuário e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
+            if opcao_menu_login == '1':
+                self.sistema.efetuar_login()
+                break
+            elif opcao_menu_login == '2':
+                self.sistema.esqueci_senha()
+                break
+            elif opcao_menu_login == '3':
+                self.menu_inicial()
+                break 
+            else:
+                print('Opção inválida')
+
+    
+    def menu_principal(self, usuario):
+        '''
+            Este é o principal local de acesso as funcionalidades do Bazar Brejó.
+            Tem 4 opções de entrada para acessar itens à venda, lançar itens, acessar configurações e sair.
+            Possui tambem cores no terminal.
+
+            Parâmetros:
+                usuario (email_log): o email do login_usuario().
+
+            Se a opção for inválida continuar até receber uma entrada válida.
+        '''
+
+        print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
+        print('\033[m\033[m') # Para não ir em todo comando
+        # Exibir opções da página
+        print ('1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
+        resposta_mp = input ('\nDigite a opção desejada: ').strip()
+        while True:
+            if resposta_mp == '1':
+                Sistema.limpar_terminal()
+                print('Itens disponíveis')
+                comprar_itens(usuario)
+                break
+            elif resposta_mp == '2':
+                Sistema.limpar_terminal()
+                print('Adicionar item')
+                lancar_itens(usuario)
+                break
+            elif resposta_mp == '3':
+                Sistema.limpar_terminal()
+                self.menu_config(usuario)
+                break
+            elif resposta_mp == 'x':
+                # Animação da saída do terminal
+                Sistema.limpar_terminal()
+                print("Encerrando Programa\nLimpando a tela em:")
+                for i in range(3, 0, -1):
+                    print(f"{i}...")
+                    time.sleep(1)
+                Sistema.limpar_terminal()
+                break
+            else:
+                print('Opção inválida')
+                Sistema.limpar_terminal()
+
+    def menu_config(self, usuario):
+        '''
+            Aqui são exibidas as opções das configurações como feedback, mudar nome, mudar senha, excluir conta e voltar.
+
+            Parâmetros:
+                usuario (email_log): o email do login_usuario().
+
+            Se a opção for inválida continuar até receber uma entrada válida.
+        '''
+        while True:
+            print('=============\nConfigurações\n=============\n')
+            print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Voltar')
+            resposta_mc = input('\nDigite a opção desejada: ').strip()
+            if resposta_mc == '1':
+                Sistema.limpar_terminal()
+                print('Feedback')
+                feedback(usuario)
+                break
+            elif resposta_mc == '2':
+                Sistema.limpar_terminal()
+                print('Mudar nome da conta')
+                mudar_nome_config(usuario)
+                break
+            elif resposta_mc == '3':
+                Sistema.limpar_terminal()
+                print('Mudar senha da conta')
+                mudar_senha_config(usuario)
+                break
+            elif resposta_mc == '4':
+                Sistema.limpar_terminal()
+                excluir_conta(usuario)
+                break
+            elif resposta_mc == '5':
+                Sistema.limpar_terminal()
+                menu_global.menu_principal(usuario)
+                break
+            else:
+                print('Opção inválida')
+                Sistema.limpar_terminal()
+
+
+                
+
+class Sistema:
+    def __init__(self):
+        pass
+        
+    def cadastrar(self):
+        '''
+            Aqui é onde o CRUD começa de fato. Essa função recebe as entradas: nome, email e senha.
+            Essas entradas vem de cadastro_nome, cadastro_usuario e cadastro_senha respectivamente.
+            Após receber esses dados, os armazena em um arquivo chamado 'bancodedados.txt' e depois chama o login.
+        '''
+        self.limpar_terminal()
+        nome_cd = self.cadastro_nome()
+        # Cadastro do usuário
+        email_cd = self.cadastro_usuario()
+        # Cadastro da senha
+        senha_cd = self.cadastro_senha()
+        # Cadastro do Whatsapp
+        numero_cd = self.cadastro_numero()
+        # Escrever todos os cadastros no bancodedados.txt
+        with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
+            arquivo.write(f'{nome_cd},{email_cd},{senha_cd},{numero_cd}\n')
+        # Ir para o login após cadastro
+        self.efetuar_login()
+
+    def efetuar_login(self):
+        '''
+            Essa função recebe a entrada do usuário pelo login_usuario e o localiza no bancodedados.txt.
+            Após a leitura, o email é separado da senha pelo .split(',').
+            Depois compara a senha com o input senha_log para verificar se a senha está correta.
+            Se o usuário não estiver no banco de dados ele retorna. 
+            Se a senha não for encontrada continua até receber a senha correta.
+        '''
+        self.limpar_terminal() 
+        # Login de usuário:
+        usuario = self.login_usuario()
+        # Login da senha:
+        # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
+        with open('bancodedados.txt', 'r') as arquivo:
+            usuarios = {}
+            for line in arquivo:
+                partes = line.strip().split(',') 
+                if len(partes) == (3 or 4):   # Separa email da senha
+                    email = partes[1].strip()
+                    senha = partes[2].strip()
+                    usuarios[email] = senha
+
+        if usuario not in usuarios: # Se usuário não tiver no banco de dados
+            self.limpar_terminal()
+            print('Usuário não encontrado.')
+            return                    
+                
+        # Login da senha:
+        while True: 
+            print('Login: Sua senha tem 8 caracteres')
+            senha_log = input_senha('Senha: ').strip() # Chamar criptografia
+
+            # Se a senha for a mesma da linha do usuário no banco de dados
+            if senha_log == usuarios[usuario]:
+                self.limpar_terminal()
+                menu_global.menu_principal(usuario)
+                return senha_log and usuario
+                
+            else:
+                self.limpar_terminal()
+                print('Senha incorreta')
+
+    def cadastro_nome(self):
+        '''
+            Nessa função o nome do usuario é a entrada que vai ser retornada ao cadastro.
+            Antes de retornar, confere se o nome já está em uso lendo o bancodedados.txt.
+            Se nome já está cadastrado repete o input para nova entrada.
+
+        '''
+        print('Digite seu nome')
+        while True:
+            nome_cd = input('Nome: ').strip()
+            # Checar se nome já é cadastrado
+            with open('bancodedados.txt', 'r') as arquivo:
+                usuarios = arquivo.read()
+            if nome_cd in usuarios:
+                print('Esse nome já foi usado')
+            else:
+                self.limpar_terminal()
+                return nome_cd
+
+    def cadastro_usuario(self):
+        '''
+            Nessa função o email do usuario é a entrada que vai ser retornada ao cadastro.
+            Restringe a entrada para conter um email válido: @ufrpe.br ou @gmail.com
+            Antes de retornar, confere se o email já está em uso lendo o bancodedados.txt.
+            Se email está inválido continua até receber uma entrada válida.
+            Se email já está cadastrado repete o input para nova entrada.
+        '''
+        print ('Cadastro : digite o usuário (e-mail)')
+        print ('O usuário precisa terminar com @gmail.com ou @ufrpe.br')
+        while True:
+            email_cd = input ('Usuário: ').strip().lower()
+            email_arroba = email_cd.split('@')
+            # Restrição de e-mails para o usuário: @ e terminar com entradas válidas
+            if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
+                self.limpar_terminal()
+                print('Usuário válido')
+                # Checar se usuário já é cadastrado
+                with open('bancodedados.txt', 'r') as arquivo:
+                    usuarios = arquivo.read()
+                if email_cd in usuarios:
+                    self.limpar_terminal()
+                    print('Usuário já cadastrado, Insira outro e-mail!')
+                else:
+                    self.limpar_terminal()
+                    return email_cd
+            else:
+                self.limpar_terminal()
+                print('Usuário inválido. E-mails aceitos: @ufrpe.br ou @gmail.com')
+
+    def cadastro_senha(self):
+        '''
+            Aqui recebe-se a entrada da senha do cadastro com confirmação.
+            As restrinções são o tamanho (precisa conter 8 caracteres) e a tecla de espaço.
+            Se a senha não obedecer as restrinções continua até receber uma entrada válida.
+            Se a senha não for a mesma na confirmação repete o input até ter confimação.
+        '''
+        while True:
+            print('Sua senha precisa ter 8 caracteres')
+            senha_cd = input_senha('Senha: ').strip()
+            
+            # Restrição do tamanho da senha
+            if len(senha_cd) != 8:
+                self.limpar_terminal()
+                print('senha inválida.')
+            # Confirmação da senha
+            else:
+                senha_2 = input_senha('Confirme a senha: ').strip()
+                if senha_cd == senha_2:
+                    self.limpar_terminal()
+                    print('Senha cadastrada!') 
+                    return senha_cd
+                else:
+                    self.limpar_terminal()
+                    print('As senhas precisam ser idênticas.')
+
+    def cadastro_numero(self):
+        '''
+        Fazer a docstring...
+        '''
+
+        print('Deseja cadastrar seu Whatsapp?\n1. Sim\n2. Não')
+        opcao_cd_numero = input('Digite: ')
+        if opcao_cd_numero == '1':
+            while True:
+                print('Digite seu Whatsapp, apenas números!')
+                numero_cd = input('Número: ').strip()
+                # Restricões do tamanho do número. Padrão (81) 912341234
+                if len(numero_cd) != 11:
+                    print('Número inválido. Padrão => 81983548906')
+                else:
+                    self.limpar_terminal()
+                    print('Número Cadastrado')
+                    return numero_cd
+        elif opcao_cd_numero == '2':
+            self.limpar_terminal
+            return "" # Precisa retornar o vazio.
+        else:
+            print('Opção Inválida! Digite 1 ou 2.')
+            
+        
+    def login_usuario(self):
+        '''
+            Essa função recebe o email e lê o bancodedados.txt para verificar se o usuário é válido.
+            Se o email não estiver no txt repete o input até receber uma entrada válida.
+        '''
+        while True:
+            print('Login: digite seu e-mail:')
+            email_log = input('Usuário: ').strip()
+
+            # Checar se o usuário está presente no arquivo
+            with open('bancodedados.txt', 'r') as arquivo:
+                txt = arquivo.read()
+            if email_log in txt:
+                print('Usuário valido')
+                return email_log
+            else:
+                self.limpar_terminal()
+                print('Usuário inválido ou esse e-mail não está cadastrado')
+        
+    def esqueci_senha(self):
+        '''
+            Aqui está presente a função que consegue mudar a senha do usuário cadastrado antes do login.
+            Isso é possível porque após confirmar o usuário o código manda um código para o email do usuário.
+            Depois chama as funções enviar_email e mudar_senha_esqueci para a confirmação do código e troca de senha
+            Se o email não estiver no txt, repete o input até receber uma entrada válida.
+            Se o código não estiver correto, repete o input até confirmar o código.
+            
+        '''
+        while True:
+            print('Login: digite seu e-mail para recuperar senha:')
+            email_log = input('Usuário: ').strip()
+
+            # Checar se o usuário está presente no arquivo
+            with open('bancodedados.txt', 'r') as arquivo:
+                txt = arquivo.read()
+            if email_log in txt:
+                print('Usuário valido')
+                print('Enviando email...')
+                codigo =  random.randint(100000,999999) 
+                conteudo = (f"Olá! Seu código de verificação é: {codigo}")
+                enviar_email(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
+                while True:
+                    codigo_input = input('digite o código enviado ao seu email: ').strip()
+                    if codigo_input == str(codigo):
+                        print('Código correto. Agora crie uma senha nova')
+                        mudar_senha_esqueci(email_log)
+                        return codigo_input and email_log
+                    else:
+                        print('Código incorreto')
+                    
+            else:
+                self.limpar_terminal()
+                print('Usuário inválido ou esse e-mail não está cadastrado')
+    @staticmethod
+    def limpar_terminal():
+        '''
+            Aqui está a função mais usada do código.
+            Ela limpa o terminal tanto em sistemas Windows quanto Mac e Linux
+        '''
+        # Para limpar o terminal em qualquer os
+        os.system('cls' if os.name == 'nt' else 'clear')
 
 def main(): # Sempre começar pelo Menu Incial
     '''
         Essa função é por onde o código inicia e chama o menu_inicial() para iniciar o programa.
     '''
-    limpar_terminal()
-    menu_inicial()
+
+    Sistema.limpar_terminal()
+    global menu_global
+    sistema = Sistema()
+    menu_global = Menu(sistema)
+    menu_global.menu_inicial()
 
 if __name__ == '__main__':
     main()  
