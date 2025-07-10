@@ -617,11 +617,13 @@ def negociar(usuario):
             opcao_nmr_voltar = input('X. para voltar: ').strip().upper()
             if opcao_nmr_voltar == 'X':
                 menu_principal(usuario)
+                break
             else:
                 print('Opção Inválida!')
         elif opcao_ngc == '3':
             limpar_terminal()
             menu_principal(usuario)
+            break
         else:
             print('Opção Inválida!')
         
