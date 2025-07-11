@@ -332,59 +332,7 @@ def lancar_itens(usuario):
     menu_global.menu_principal(usuario)
 
             
-def feedback(usuario): 
-    '''
-        Aqui está a conexão entre o usuário e os desenvolvedores, uma opção de enviar email para os criadores do programa.
-        Essa função envia a mensagem (input) para Breno, João e o próprio usuário para mostrar e possibilitar a conversa ao cliente
-
-        Parâmetros:
-            usuario (email_log): o email do login_usuario().
-    
-        Também tem a opção de editar ou cancelar o envio da mensagem
-        Se não for possível enviar email retornar.
-
-    '''
-    # Achar e-mail do usuario
-    email_feedback = None
-    with open('bancodedados.txt', 'r') as arquivo:
-        for linha in arquivo:
-            partes = linha.strip().split(',')
-            if len(partes) == 3:
-                email = partes[1].strip()
-                if email == usuario:
-                    email_feedback = email
-                    break  # achou a linha do e-mail e para
-    if email_feedback is None:
-        print('Erro tentar novamente')
-        return            
-    email_suporte1 = 'joao.soaresaraujo@ufrpe.br' # suporte
-    email_copia_cliente = email_feedback # email cópia do cliente
-    email_suporte2 = 'brenojaccioly@gmail.com' # suporte
-    assunto = 'Mensagem enviada dos Feedbacks Bazar Brejó'
-    while True:
-        # Escrever mensagem
-        feed_mensagem = input('Escreva seu feedback: ').strip()
-        print('1. Editar Feedback\n2. Enviar\n3. Cancelar')
-        editar = input('Digite a opção: ') 
-        if editar == '1': # Editar e-mail
-            print('Vamos editar')
-            print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
-            continue
-        elif editar == '2': # Criar e enviar e-mail
-            Sistema.limpar_terminal()
-            print('Enviando email...')
-            try:
-                enviar_email(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
-                print('Feedback enviado! Uma cópia foi enviada ao seu e-mail também.')
-            except Exception:
-                print('Erro ao enviar feedback')
-            break
-
-        elif editar == '3':
-            Sistema.limpar_terminal()
-            return menu_global.menu_config(usuario) 
-        else:
-            print('Opção Inválida!')   
+ 
 
 def mudar_nome_config(usuario):
     '''
@@ -606,6 +554,7 @@ def excluir_conta(usuario):
             Sistema.limpar_terminal()
             print('Opção inválida')    
 
+
 class Menu:
     def __init__(self, sistema):
         self.sistema = sistema
@@ -738,7 +687,7 @@ class Menu:
             if resposta_mc == '1':
                 Sistema.limpar_terminal()
                 print('Feedback')
-                feedback(usuario)
+                self.sistema.feedback(usuario)
                 break
             elif resposta_mc == '2':
                 Sistema.limpar_terminal()
@@ -984,6 +933,61 @@ class Sistema:
             else:
                 self.limpar_terminal()
                 print('Usuário inválido ou esse e-mail não está cadastrado')
+
+    def feedback(self, usuario):
+        '''
+            Aqui está a conexão entre o usuário e os desenvolvedores, uma opção de enviar email para os criadores do programa.
+            Essa função envia a mensagem (input) para Breno, João e o próprio usuário para mostrar e possibilitar a conversa ao cliente
+
+            Parâmetros:
+                usuario (email_log): o email do login_usuario().
+        
+            Também tem a opção de editar ou cancelar o envio da mensagem
+            Se não for possível enviar email retornar.
+
+        '''
+        # Achar e-mail do usuario
+        email_feedback = None
+        with open('bancodedados.txt', 'r') as arquivo:
+            for linha in arquivo:
+                partes = linha.strip().split(',')
+                if len(partes) == 3:
+                    email = partes[1].strip()
+                    if email == usuario:
+                        email_feedback = email
+                        break  # achou a linha do e-mail e para
+        if email_feedback is None:
+            print('Erro tentar novamente')
+            return            
+        email_suporte1 = 'joao.soaresaraujo@ufrpe.br' # suporte
+        email_copia_cliente = email_feedback # email cópia do cliente
+        email_suporte2 = 'brenojaccioly@gmail.com' # suporte
+        assunto = 'Mensagem enviada dos Feedbacks Bazar Brejó'
+        while True:
+            # Escrever mensagem
+            feed_mensagem = input('Escreva seu feedback: ').strip()
+            print('1. Editar Feedback\n2. Enviar\n3. Cancelar')
+            editar = input('Digite a opção: ') 
+            if editar == '1': # Editar e-mail
+                print('Vamos editar')
+                print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
+                continue
+            elif editar == '2': # Criar e enviar e-mail
+                self.limpar_terminal()
+                print('Enviando email...')
+                try:
+                    enviar_email(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
+                    print('Feedback enviado! Uma cópia foi enviada ao seu e-mail também.')
+                except Exception:
+                    print('Erro ao enviar feedback')
+                break
+
+            elif editar == '3':
+                self.limpar_terminal()
+                return menu_global.menu_config(usuario) 
+            else:
+                print('Opção Inválida!')   
+
     @staticmethod
     def limpar_terminal():
         '''
