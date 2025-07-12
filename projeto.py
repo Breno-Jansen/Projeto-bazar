@@ -556,14 +556,13 @@ def comprar_itens(usuario):
                         print('Com a confirmação um email será enviado aos vendedores e com o pagamento você poderá buscar o item :)')
                         confirmar_compra = input(' Para confirmar digite 1, \n para cancelar digite 2:')
                         if confirmar_compra == '1':
-                            id_usuario = pegar_id_usuario(usuario) # 
                             nome_produto = todos_os_itens[int(escolha_item)-1] # Ve a lista e ve o item escolhido
                             preco_bruto = todos_os_precos[int(escolha_item) - 1].strip() # Ve a lista e ve o valor
                             valor_str = ''.join(c for c in preco_bruto if c.isdigit() or c in ',.') # Mantém apenas números e separadores decimais
                             valor_str = valor_str.replace(',', '.')
                             valor = float(valor_str)
 
-                            registrar_venda(id_usuario, nome_produto, valor)
+                            registrar_compra(usuario, nome_produto, valor)
                             print('Email enviado! Venha para o Ceagri II para pegar seu item.')
                             while True:
                                 print('X. para voltar')
@@ -578,7 +577,7 @@ def comprar_itens(usuario):
                         elif confirmar_compra == '2':
                             limpar_terminal()
                             print('Voltando...')
-                            comprar_itens()
+                            comprar_itens(usuario)
                             break
                         else:
                             limpar_terminal()
@@ -711,13 +710,8 @@ def menu_config(usuario):
             break
         elif resposta_mc == '5':
             limpar_terminal()
-            id_usuario = pegar_id_usuario(usuario)
-            if id_usuario is not None:
-                mostrar_extrato(id_usuario, usuario)
-            else:
-                print('Sem extrato.') # Caso não ache o usuário
-                menu_config(usuario)
-                break
+            mostrar_extrato(usuario)
+            break
         elif resposta_mc == '6':
             limpar_terminal()
             menu_principal(usuario)
@@ -951,8 +945,10 @@ def excluir_conta(usuario):
     '''
         Aqui é a parte que se pode deletar a conta do usuário depois da confirmação digitando 1
         Após ler o bancodedados.txt a linha que contem a conta do usuário atual é apagada, excluindo assim o cadastro da pessoa.
+        E também apaga o extrato da pessoa.
         Se digitar 2, volta para o menu_config().
         Se opção inválida, continua até opção válida.
+        
         
         Parâmetros:
             usuario (email_log): o email do login_usuario().
@@ -971,15 +967,29 @@ def excluir_conta(usuario):
             print(email_excluir)
             with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
                 linhas = arquivo.readlines()
-            
-
-            nova_lista_conta = [linha for linha in linhas if linha.strip().split(',')[1] != email_excluir]
+        
+            nova_lista_conta = [
+                linha for linha in linhas 
+                if linha.strip().split(',')[1].strip() != email_excluir
+]
             if len(nova_lista_conta) == len(linhas):
                 print('Usuário não encontrado')
             else:
                 conta_excluida = True
                 with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                     arquivo.writelines(nova_lista_conta)
+
+                # Excluir Extrato
+                with open('extrato.txt', 'r', encoding= 'utf-8') as extrato_arquivo:
+                    extrato_linhas = extrato_arquivo.readlines()
+
+                nova_lista_extrato = [
+                    linha for linha in extrato_linhas if not linha.startswith(f'{usuario}:')
+                ]
+
+                with open('extrato.txt', 'w', encoding= 'utf-8') as extrato_arquivo:
+                    extrato_arquivo.writelines(nova_lista_extrato)
+                
                 print("Excluindo conta\nLimpando a tela em:")
                 for i in range(3, 0, -1):
                     print(f"{i}...")
@@ -1001,27 +1011,16 @@ def excluir_conta(usuario):
             limpar_terminal()
             print('Opção inválida')
 
-def pegar_id_usuario(email):
-    '''
-    Essa função busca o ID do usuário, que corresponde á linha em que ele aparece no bancodedados.txt.
-    '''
-    with open('bancodedados.txt', 'r', encoding='utf-8') as f:
-        linhas = f.readlines()  
-        for i, linha in enumerate(linhas, start=1):
-            partes = linha.strip().split(',')
-            if len(partes) == 3:
-                _, email_lido, _ = partes
-                if email_lido.strip() == email:
-                    return i
-            
-def registrar_venda(id_usuario, nome_produto, valor):
 
+def registrar_compra(login_usuario, nome_produto, valor):
     '''
-    Essa função salva a compra no extrato.txt
+    Essa função salva a compra no extrato.txt no formato:
+    email: item1 | item2 | item3 ...
     '''
 
-    data = datetime.now().strftime('%d-%m-%Y %H:%M') # O metodo datetime.now pega o tempo da operação e strtime faz a formatação dos horarios.
-    nova_entrada = (f'{nome_produto} - R${valor:.2f} ({data})')
+    from datetime import datetime
+    data = datetime.now().strftime('%d-%m-%Y %H:%M')
+    nova_entrada = (f' {nome_produto} - R${valor:.2f} ({data})')
 
     try:
         with open('extrato.txt', 'r', encoding='utf-8') as f:
@@ -1029,33 +1028,44 @@ def registrar_venda(id_usuario, nome_produto, valor):
     except FileNotFoundError:
         linhas = []
 
-    while len(linhas) < id_usuario:
-        linhas.append('\n')
+    nova_linha = []
+    usuario_encontrado = False
 
-    linha_atual = linhas[id_usuario - 1].strip()
-    if linha_atual:
-        linha_atual += ', ' + nova_entrada
-    else:
-        linha_atual = nova_entrada
-    
-    linhas[id_usuario - 1] = linha_atual + '\n'
+    for linha in linhas:
+        if linha.startswith(f'{login_usuario}:'):
+            usuario_encontrado = True
+            linha = linha.strip()
+            if not linha.endswith('|'):
+                linha += ' |'
+            linha += f' {nova_entrada} |'
+            nova_linha.append(linha + '\n')
+        else:
+            nova_linha.append(linha)
+
+    if not usuario_encontrado:
+        nova_linha.append(f'{login_usuario}: {nova_entrada} |\n')
 
     with open('extrato.txt', 'w', encoding='utf-8') as f:
-        f.writelines(linhas)
+        f.writelines(nova_linha)
 
-def mostrar_extrato(id_usuario, usuario):
+
+def mostrar_extrato(usuario):
     '''
     Essa função mostra o extrato do usuário.
     '''
     
     with open('extrato.txt', 'r', encoding='utf-8') as f:
         linhas = f.readlines() # Lê o estrato.txt
-        if 0 < id_usuario <= len(linhas): # Pega a linha do id_usuario
-            extrato = linhas[id_usuario - 1].strip()
-            print(f'Extrato do usuário {id_usuario}:') # Mostra as compras registradas
-            print(extrato if extrato else 'Nenhum item registrado!')
-        else:
-            print('Usuário ainda não tem extrato')
+    extrato_usuario = [linha.strip() for linha in linhas if linha.startswith(f'{usuario}')]
+    
+    print(f'Extrato do usuário {usuario}:')
+    if extrato_usuario:
+        for linha in extrato_usuario:
+            # Retira o email da frente só para mostrar a compra
+            print(linha[len(usuario) + 2:])
+    else:
+        print('Nenhum item registrado')
+        
     while True:
         print('X. Voltar')
         opcap_extrato = input('Digite: ').strip().upper()
