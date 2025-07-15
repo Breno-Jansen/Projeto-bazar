@@ -131,7 +131,7 @@ class Menu:
 
         while True:
             print('=============\nConfigurações\n=============\n')
-            print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Voltar')
+            print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Ver extrato\n6. Voltar')
             resposta_mc = input('\nDigite a opção desejada: ').strip()
             if resposta_mc == '1':
                 self.limpar_terminal()
@@ -153,6 +153,9 @@ class Menu:
                 self.usuario.excluir_conta(usuario)
                 break
             elif resposta_mc == '5':
+                self.limpar_terminal()
+                self.usuario.mostrar_extrato(usuario)
+            elif resposta_mc == '6':
                 self.limpar_terminal()
                 menu_global.menu_principal(usuario)
                 break

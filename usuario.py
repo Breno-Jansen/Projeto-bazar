@@ -685,6 +685,72 @@ class Usuario:
                 return menu_global.menu_config(usuario) 
             else:
                 print('Opção Inválida!')   
+    
+    def registrar_compra(self, login_usuario, nome_produto, valor):
+        '''
+        Salva a compra no extrato.txt no formato:
+        email: item1 | item2 | item3 ...
+        '''
+
+        from datetime import datetime # Import para usar o datetime.now, registra a data e hora atual
+
+        data = datetime.now().strftime('%d-%m-%Y %H:%M')
+        nova_entrada = (f'{nome_produto} - R${valor:.2f} ({data})')
+
+        try:
+            with open('extrato.txt', 'r', encoding= 'utf-8') as f:
+                linhas = f.readlines()
+        except FileNotFoundError:
+            linhas = []
+        
+        nova_linha = []
+        usuario_encontrado = False
+
+        for linha in linhas:
+            if linha.startswith(f'{login_usuario}:'):
+                usuario_encontrado = True
+                linha = linha.strip()
+                if not linha.endswith('|'):
+                    linha += ' |'
+                linha += f' {nova_entrada} |'
+                nova_linha.append(linha + '\n')
+            else:
+                nova_linha.append(linha)
+
+        if not usuario_encontrado:
+            nova_linha.append(f'{login_usuario}: {nova_entrada} |\n')
+
+        with open('extrato.txt', 'w', encoding='utf-8') as f:
+            f.writelines(nova_linha)
+    
+    def mostrar_extrato(self, usuario):
+        from sistema import menu_global
+        from menu import Menu
+
+        
+        try:
+            with open('extrato.txt', 'r', encoding='utf-8') as f:
+                linhas = f.readlines()
+        except FileNotFoundError:
+            linhas = []
+
+        print(f'\nExtrato do usuário {usuario}:\n')
+        encontrou = False
+        for linha in linhas:
+            if linha.startswith(f'{usuario}'):
+                print(linha.strip())
+                encontrou = True
+
+        if not encontrou:
+            print('Nenhum item registrado.')
+
+        while True:
+            print('\nX. Voltar')
+            opcao = input('Digite: ').strip().upper()
+            if opcao == 'X':
+                Menu.limpar_terminal()
+                menu_global.menu_config(usuario)
+                break
 
     
 

@@ -82,6 +82,23 @@ class Item:
         item.salvar_item()
 
     @staticmethod
+    def remover_item_do_arquivo(nome_item):
+        """
+        Remove o item com o nome correspondente do arquivo listadeitens.txt
+        """
+        try:
+            with open('listadeitens.txt', 'r', encoding='utf-8') as f:
+                linhas = f.readlines()
+
+            with open('listadeitens.txt', 'w', encoding='utf-8') as f:
+                for linha in linhas:
+                    if nome_item not in linha:
+                        f.write(linha)
+        except FileNotFoundError:
+            print('Arquivo listadeitens.txt não encontrado.')
+
+
+    @staticmethod
     def comprar_itens(usuario):
         """
             Mostra os itens disponíveis do txt e permite ao usuário comprar ou negociar.
@@ -89,6 +106,8 @@ class Item:
         """
         from sistema import menu_global
         from menu import Menu
+        from usuario import Usuario
+        usuario_obj = Usuario()
         itens = Item.carregar_itens()
 
         if not itens:
@@ -122,7 +141,19 @@ class Item:
                         confirmar = input('1. Confirmar compra\n2. Cancelar\nOpção: ')
                         if confirmar == '1':
                             print('Email enviado! Venha para o Ceagri II para pegar seu item.')
-                            break
+                            # Registra no extrato
+                            try:
+                                preco_float = float(item_selecionado.preco.replace(',','.'))
+                                usuario_obj.registrar_compra(usuario, item_selecionado.nome, preco_float)
+                            except Exception as e:
+                                print('Erro ao registrar no extrato:', e)
+                            # Remove do arquivo listadeitens.txt
+                            try:
+                                Item.remover_item_do_arquivo(item_selecionado.nome)
+                            except Exception as e:
+                                print('Erro ao remover item', e)
+
+                            return menu_global.menu_principal(usuario)    
                         elif confirmar == '2':
                             Menu.limpar_terminal()
                             print('Voltando...')
