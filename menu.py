@@ -1,10 +1,15 @@
 from item import Item
 import os
 import time
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
 
+console = Console()
 class Menu:
     def __init__(self, usuario):
         self.usuario = usuario
+        
     def menu_inicial(self):
         '''
             A primeira tela do programa é esse menu que contem as opções de Cadastro e Login para acessar o bazar.
@@ -16,61 +21,98 @@ class Menu:
         while True:
             self.limpar_terminal()
             # Exibir opções no Menu
-            print('Para entrar no Bazar escolha uma opção: \n1. Cadastro \n2. Login')
+            width = console.size.width
+            painel_width = max(40, min(80, width - 10)) # Tamanho do painel
+
+            texto_menu = (
+            '[bold cyan]Para entrar no Bazar escolha uma opção:[/bold cyan]\n\n'
+            '1 - Cadastro\n'
+            '2 - Login'
+            )
+
+            painel = Panel(texto_menu, title= '[bold magenta]MENU INICIAL[/bold magenta]', width=painel_width)
+            console.print(painel)
+
             opcao_inicial = input('Digite a opção desejada: ').strip()
             if opcao_inicial == '1':
                 self.menu_cadastro()
                 break
             elif opcao_inicial == '2':
-                self.menu_login() 
-                break 
+                self.menu_login()
+                break
             else:
-                self.limpar_terminal()
-                print('Escolha 1 ou 2')
-
+                console.print('[red]Escolha 1 ou 2[/red]')
+                input('Pressione Enter para tentar novamente...')
     def menu_cadastro(self):
         '''
             Similar ao menu inicial, aqui também são exibidas opções para acessar o Bazar: novo usuário ou voltar
-            Recebe as entradas 1, 2 e 3 como opções de cadastrar, voltar para fazer o login e voltar ao menu inicial
-            Em caso de uma entrada inválida continua até receber 1, 2 ou 3.
+            Recebe as entradas 1, 2 e X como opções de cadastrar, voltar para fazer o login e voltar ao menu inicial
+            Em caso de uma entrada inválida continua até receber 1, 2 ou X.
         '''
         while True:
             self.limpar_terminal()
             # Opções do cadastro, ir para login e voltar
-            opcao_menu_cadastro = input('Login: Escolha uma opção: \n1. Novo usuário e senha \n2. Já tem conta? Volte e façe o login \n3. Voltar ao menu inicial \n').strip()
+            width = console.size.width
+            painel_width = max(40, min(80, width - 10))
+
+            texto_menu = (
+            '[bold cyan]Para realizar o cadastro:[/bold cyan]\n\n'
+            '1 - Novo usuário\n'
+            '2 - Já tem conta? Faça o login\n'
+            'X - Voltar ao menu inicial'
+            )
+
+            painel = Panel(texto_menu, title="[bold magenta]CADASTRO[/bold magenta]", width=painel_width)
+            console.print(painel)
+
+            opcao_menu_cadastro = input('Sua escolha: ').strip().lower()
             if opcao_menu_cadastro == '1':
                 self.usuario.cadastrar()
                 break
             elif opcao_menu_cadastro == '2':
                 self.menu_inicial()
                 break
-            elif opcao_menu_cadastro == '3':
+            elif opcao_menu_cadastro == 'x':
                 self.menu_inicial()
                 break 
             else:
-                print('Opção invalid    a')
+                console.print('[red]Opção inválida[/red]')
+                input('Pressione Enter para tentar novamente...')
 
     def menu_login(self):
         '''
             Nesse menu são exibidas opções para acessar o Bazar ou para voltar. 
-            Recebe as entradas 1, 2 e 3 como opções de login, esqueci a senha e voltar ao menu inicial.
-            Em caso de uma entrada inválida continua até receber 1, 2 ou 3.
+            Recebe as entradas 1, 2 e X como opções de login, esqueci a senha e voltar ao menu inicial.
+            Em caso de uma entrada inválida continua até receber 1, 2 ou X.
         '''
         while True:
             self.limpar_terminal()
             # Opções do login, esqueci senha e voltar
-            opcao_menu_login = input('Login: Escolha uma opção: \n1. Usuário e senha \n2. Esqueci a senha \n3. Voltar ao menu inicial \n').strip()
+            width = console.size.width
+            painel_width = max(40, min(80, width - 10))
+
+            texto_menu = (
+            '[bold cyan]Para realizar o login:[/bold cyan]\n\n'
+            '1 - Usuário e senha\n'
+            '2 - Esqueci a senha\n'
+            'X - Voltar ao menu inicial'
+            )
+
+            painel = Panel(texto_menu, title="[bold magenta]LOGIN[/bold magenta]", width=painel_width)
+            console.print(painel)
+            opcao_menu_login = input('Sua escolha: ').strip().lower()
             if opcao_menu_login == '1':
                 self.usuario.efetuar_login()
                 break
             elif opcao_menu_login == '2':
                 self.usuario.esqueci_senha()
                 break
-            elif opcao_menu_login == '3':
+            elif opcao_menu_login == 'x':
                 self.menu_inicial()
                 break 
             else:
                 print('Opção inválida')
+                input('Pressione Enter para tentar novamente...')
 
     
     def menu_principal(self, usuario):
