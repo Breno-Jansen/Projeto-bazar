@@ -11,8 +11,12 @@ from rich.prompt import Prompt
 
 class Usuario:
 
-    def __init__(self):
-        pass        
+    def __init__(self, nome=None, email=None, senha=None, numero=None):
+        self.nome = nome
+        self.email = email
+        self.senha = senha
+        self.numero = numero 
+
     def input_senha(self, prompt = 'Senha: '): # Senha com asteriscos
     
         '''
@@ -137,16 +141,18 @@ class Usuario:
         '''
         from menu import Menu
         Menu.limpar_terminal()
-        nome_cd = self.cadastro_nome()
+        # Cadastro do nome
+        self.nome = self.cadastro_nome()
         # Cadastro do usuário
-        email_cd = self.cadastro_usuario()
+        self.email = self.cadastro_usuario()
         # Cadastro da senha
-        senha_cd = self.cadastro_senha()
+        self.senha = self.cadastro_senha()
         # Cadastro do Whatsapp
-        numero_cd = self.cadastro_numero()
+        self.numero = self.cadastro_numero()
+
         # Escrever todos os cadastros no bancodedados.txt
         with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-            arquivo.write(f'{nome_cd},{email_cd},{senha_cd},{numero_cd}\n')
+            arquivo.write(f'{self.nome},{self.email},{self.senha},{self.numero}\n')
         # Ir para o login após cadastro
         self.efetuar_login()
 
@@ -162,37 +168,28 @@ class Usuario:
         from menu import Menu
         Menu.limpar_terminal() 
         # Login de usuário:
-        usuario = self.login_usuario()
-        # Login da senha:
-        # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
+        email_input = self.login_usuario()
+
         with open('bancodedados.txt', 'r') as arquivo:
-            usuarios = {}
-            for line in arquivo:
-                partes = line.strip().split(',') 
-                if len(partes) == (3 or 4):   # Separa email da senha
-                    email = partes[1].strip()
-                    senha = partes[2].strip()
-                    usuarios[email] = senha
-
-        if usuario not in usuarios: # Se usuário não tiver no banco de dados
-            Menu.limpar_terminal()
-            print('Usuário não encontrado.')
-            return                    
-                
-        # Login da senha:
-        while True: 
-            print('Login: Sua senha tem 8 caracteres')
-            senha_log = self.input_senha('Senha: ').strip() # Chamar criptografia
-
-            # Se a senha for a mesma da linha do usuário no banco de dados
-            if senha_log == usuarios[usuario]:
-                Menu.limpar_terminal()
-                menu_global.menu_principal(usuario)
-                return senha_log and usuario
-                
-            else:
-                Menu.limpar_terminal()
-                print('Senha incorreta')
+            for linha in arquivo:
+                partes = linha.strip().split(',')
+                if len(partes) >= 3:
+                    nome, email, senha = partes[:3]
+                    numero = partes[3] if len(partes) == 4 else ""
+                    if email == email_input:
+                        while True:
+                            senha_log = self.input_senha('Senha: ').strip()
+                            if senha_log == senha:
+                                self.nome = nome
+                                self.email = email
+                                self.senha = senha
+                                self.numero = numero
+                                Menu.limpar_terminal()
+                                menu_global.menu_principal(self.email)
+                                return
+                            else:
+                                Menu.limpar_terminal()
+                                print('Senha incorreta')
 
     def cadastro_nome(self):
         '''
@@ -292,7 +289,7 @@ class Usuario:
                     print('Número Cadastrado')
                     return numero_cd
         elif opcao_cd_numero == '2':
-            self.limpar_terminal
+            Menu.limpar_terminal()
             return "" # Precisa retornar o vazio.
         else:
             print('Opção Inválida! Digite 1 ou 2.')
@@ -708,28 +705,27 @@ class Usuario:
             else:
                 print('Opção Inválida!')   
 
-    def registrar_compra(self, login_usuario, nome_produto, valor):
+    def registrar_compra(self, nome_produto, valor):
         '''
         Salva a compra no extrato.txt no formato:
         email: item1 | item2 | item3 ...
         '''
 
-        from datetime import datetime # Import para usar o datetime.now, registra a data e hora atual
-
+        from datetime import datetime
         data = datetime.now().strftime('%d-%m-%Y %H:%M')
-        nova_entrada = (f'{nome_produto} - R${valor:.2f} ({data})')
-
+        nova_entrada = f'{nome_produto} - R${valor:.2f} ({data})'
+    
         try:
-            with open('extrato.txt', 'r', encoding= 'utf-8') as f:
+            with open('extrato.txt', 'r', encoding='utf-8') as f:
                 linhas = f.readlines()
         except FileNotFoundError:
             linhas = []
-        
+    
         nova_linha = []
         usuario_encontrado = False
-
+    
         for linha in linhas:
-            if linha.startswith(f'{login_usuario}:'):
+            if linha.startswith(f'{self.email}:'):
                 usuario_encontrado = True
                 linha = linha.strip()
                 if not linha.endswith('|'):
@@ -738,13 +734,12 @@ class Usuario:
                 nova_linha.append(linha + '\n')
             else:
                 nova_linha.append(linha)
-
-        if not usuario_encontrado:
-            nova_linha.append(f'{login_usuario}: {nova_entrada} |\n')
-
-        with open('extrato.txt', 'w', encoding='utf-8') as f:
-            f.writelines(nova_linha)
     
+        if not usuario_encontrado:
+            nova_linha.append(f'{self.email}: {nova_entrada} |\n')
+    
+        with open('extrato.txt', 'w', encoding='utf-8') as f:
+            f.writelines(nova_linha)    
     def mostrar_extrato(self, usuario):
         from sistema import menu_global
         from menu import Menu
@@ -781,3 +776,4 @@ class Usuario:
                 Menu.limpar_terminal()
                 menu_global.menu_config(usuario)
                 break
+
