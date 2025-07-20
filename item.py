@@ -144,7 +144,7 @@ class Item:
                             # Registra no extrato
                             try:
                                 preco_float = float(item_selecionado.preco.replace(',','.'))
-                                usuario_obj.registrar_compra(usuario, item_selecionado.nome, preco_float)
+                                usuario_obj.registrar_compra(item_selecionado.nome, preco_float)
                             except Exception as e:
                                 print('Erro ao registrar no extrato:', e)
                             # Remove do arquivo listadeitens.txt
