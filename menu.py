@@ -111,7 +111,7 @@ class Menu:
                 self.menu_inicial()
                 break 
             else:
-                print('Opção inválida')
+                console.print('[red]Opção inválida[/red]')
                 input('Pressione Enter para tentar novamente...')
 
     
@@ -127,20 +127,32 @@ class Menu:
             Se a opção for inválida continuar até receber uma entrada válida.
         '''
 
-        print ('','\033[34m=' * 60, f'\n \033[1;35m    ▁ ▂ ▄ ▅ ▆ ▇ █ BEM VINDO AO BAZAR BREJÓ █ ▇ ▆ ▅ ▄ ▂ ▁\033[m  \n\n      - \033[37mO Bazar/Brechó da UFRPE criado por BREno e JOão -\033[m\n','\033[34m='*60)
-        print('\033[m\033[m') # Para não ir em todo comando
         # Exibir opções da página
-        print ('1. Acessar itens à venda  \n2. Lançar item \n3. Configurações \nX. Sair')
-        resposta_mp = input ('\nDigite a opção desejada: ').strip()
+       
         while True:
+            self.limpar_terminal()
+            width = console.size.width
+            painel_width = max(50, min(80, width - 10)) 
+
+            titulo = '[bold magenta]BAZAR BREJÓ[/bold magenta]'   
+            texto = (
+                '[bold cyan]BEM-VINDO AO BAZAR BREJÓ[/bold cyan]\n\n'
+                '1 - Acessar itens à venda\n'
+                '2 - Lançar item\n'
+                '3 - Configurações\n'
+                'X - Sair'
+            )
+            painel = Panel(texto, title = titulo, width = painel_width)
+            console.print(painel)
+            resposta_mp = Prompt.ask('[bold yellow]Digite a opção desejada: [/bold yellow]')
             if resposta_mp == '1':
                 self.limpar_terminal()
-                print('Itens disponíveis')
+                console.print('[bold green]Itens disponíveis[/bold green]')
                 Item.comprar_itens(usuario)
                 break
             elif resposta_mp == '2':
                 self.limpar_terminal()
-                print('Adicionar item')
+                console.print('[green]Adicionar item[/green]')
                 Item.lancar_item(usuario)
                 break
             elif resposta_mp == '3':
@@ -150,14 +162,15 @@ class Menu:
             elif resposta_mp == 'x':
                 # Animação da saída do terminal
                 self.limpar_terminal()
-                print("Encerrando Programa\nLimpando a tela em:")
+                print('Encerrando Programa\nLimpando a tela em:')
                 for i in range(3, 0, -1):
                     print(f"{i}...")
                     time.sleep(1)
                 self.limpar_terminal()
                 break
             else:
-                print('Opção inválida')
+                console.print('[red]Opção inválida[/red]')
+                input('Pressione Enter para tentar novamente...')
                 self.limpar_terminal()
 
     def menu_config(self, usuario):
@@ -172,22 +185,36 @@ class Menu:
         from sistema import menu_global
 
         while True:
-            print('=============\nConfigurações\n=============\n')
-            print('1. Feedback \n2. Mudar nome \n3. Mudar senha\n4. Exluir conta \n5. Ver extrato\n6. Voltar')
-            resposta_mc = input('\nDigite a opção desejada: ').strip()
+            self.limpar_terminal()
+            width = console.size.width
+            painel_width = max(50, min(80, width - 10))
+
+            titulo = '[bold magenta]CONFIGURAÇÕES[/bold magenta]'
+            texto = (
+                '1 - Feedback\n'
+                '2 - Mudar nome\n'
+                '3 - Mudar senha\n'
+                '4 - Excluir conta\n'
+                '5 - Ver extrato\n'
+                'X - Voltar'
+            )
+            painel = Panel(texto, title = titulo, width = painel_width)
+            console.print(painel)
+            resposta_mc = Prompt.ask('[bold yellow]Digite a opção desejada: [/bold yellow]').strip().lower()
+
             if resposta_mc == '1':
                 self.limpar_terminal()
-                print('Feedback')
+                console.print('[bold green]Feedback[/bold green]')
                 self.usuario.feedback(usuario)
                 break
             elif resposta_mc == '2':
                 self.limpar_terminal()
-                print('Mudar nome da conta')
+                console.print('[bold green]Mudar nome da conta[/bold green]')
                 self.usuario.mudar_nome_config(usuario)
                 break
             elif resposta_mc == '3':
                 self.limpar_terminal()
-                print('Mudar senha da conta')
+                console.print('[bold green]Mudar senha da conta[/bold green]')
                 self.usuario.mudar_senha_config(usuario)
                 break
             elif resposta_mc == '4':
@@ -197,12 +224,13 @@ class Menu:
             elif resposta_mc == '5':
                 self.limpar_terminal()
                 self.usuario.mostrar_extrato(usuario)
-            elif resposta_mc == '6':
+            elif resposta_mc == 'x':
                 self.limpar_terminal()
                 menu_global.menu_principal(usuario)
                 break
             else:
-                print('Opção inválida')
+                console.print('[red]Opção inválida[/red]')
+                input('Pressione Enter para tentar novament...')
                 self.limpar_terminal()
     
     @staticmethod

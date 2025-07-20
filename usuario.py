@@ -5,6 +5,8 @@ import random # Import que possibilita números randomicos
 import smtplib # Import para fazer login no meu email
 from email.mime.multipart import MIMEMultipart # Função para criar uma mensagem de e-mail que pode conter texto ou anexos
 from email.mime.text import MIMEText # Função para criar o conteúdo de texto que será colocado no e-mail
+from rich.console import Console
+from rich.panel import Panel
 
 class Usuario:
 
@@ -726,31 +728,36 @@ class Usuario:
     def mostrar_extrato(self, usuario):
         from sistema import menu_global
         from menu import Menu
-
         
+        
+        console = Console()
         try:
             with open('extrato.txt', 'r', encoding='utf-8') as f:
                 linhas = f.readlines()
         except FileNotFoundError:
             linhas = []
 
-        print(f'\nExtrato do usuário {usuario}:\n')
         encontrou = False
+        conteudo = ""
+
         for linha in linhas:
             if linha.startswith(f'{usuario}'):
-                print(linha.strip())
+                conteudo_raw = linha.split(':', 1)[1].strip().strip('|')
+                itens = [f'• {item.strip()}' for item in conteudo_raw.split('|') if item.strip()]
+                conteudo = '\n'.join(itens)
                 encontrou = True
+                break
 
-        if not encontrou:
-            print('Nenhum item registrado.')
+        if encontrou:
+            panel = Panel(conteudo, title=f'Extrato do usuário: {usuario}', border_style='green')
+            console.print(panel)
+        else:
+            console.print(f'[bold red]Nenhum item registrado para {usuario}.[/bold red]')
 
         while True:
-            print('\nX. Voltar')
+            console.print('\n[bold yellow]X[/bold yellow] - Voltar')
             opcao = input('Digite: ').strip().upper()
             if opcao == 'X':
                 Menu.limpar_terminal()
                 menu_global.menu_config(usuario)
                 break
-
-    
-
