@@ -7,6 +7,7 @@ from email.mime.multipart import MIMEMultipart # Função para criar uma mensage
 from email.mime.text import MIMEText # Função para criar o conteúdo de texto que será colocado no e-mail
 from rich.console import Console
 from rich.panel import Panel
+from rich.prompt import Prompt
 
 class Usuario:
 
@@ -646,6 +647,7 @@ class Usuario:
         '''
         from sistema import menu_global
         from menu import Menu
+        console =  Console()
         # Achar e-mail do usuario
         email_feedback = None
         with open('bancodedados.txt', 'r') as arquivo:
@@ -657,7 +659,7 @@ class Usuario:
                         email_feedback = email
                         break  # achou a linha do e-mail e para
         if email_feedback is None:
-            print('Erro tentar novamente')
+            console.print('[bold red]Erro tentar novamente[/bold red]')
             return            
         email_suporte1 = 'joao.soaresaraujo@ufrpe.br' # suporte
         email_copia_cliente = email_feedback # email cópia do cliente
@@ -665,29 +667,47 @@ class Usuario:
         assunto = 'Mensagem enviada dos Feedbacks Bazar Brejó'
         while True:
             # Escrever mensagem
-            feed_mensagem = input('Escreva seu feedback: ').strip()
-            print('1. Editar Feedback\n2. Enviar\n3. Cancelar')
-            editar = input('Digite a opção: ') 
+            console.print(Panel('Envie aqui seu feedback sobre o sistema 📨', title = '📬 Envio de Feedback', border_style = 'purple'))
+            feed_mensagem = Prompt.ask('Escreva seu feedback: ').strip()
+            
+            console.print(Panel(f'[yellow]{feed_mensagem}[/yellow]'))
+            console.print('[bold]1 -[/bold] Editar Feedback\n[bold]2 -[/bold] Enviar Feedback\n[bold]3 -[/bold] Cancelar')
+            editar = input('Digite a opção: ').strip()
             if editar == '1': # Editar e-mail
                 print('Vamos editar')
                 print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
                 continue
             elif editar == '2': # Criar e enviar e-mail
                 Menu.limpar_terminal()
-                print('Enviando email...')
+                console.print('[bold blue]Enviando e-mail...[/bold blue]')
                 try:
                     self.enviar_email(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
-                    print('Feedback enviado! Uma cópia foi enviada ao seu e-mail também.')
+                    from rich.align import Align
+
+                    msg_comprovante = Panel(
+                        Align.center(
+                            '[bold green]✅ Feedback enviado com sucesso![/bold green]\n\n[white]Uma cópia foi enviada ao seu e-mail[/white]',
+                            vertical="middle"
+                        ),
+                        title = '✔️ Obrigado pelo seu Feedback!',
+                        border_style = 'green',
+                        padding = (1, 4),
+                        width = 60
+                    )
+                    console.print(msg_comprovante)
+                    input('Pressione Enter para voltar...')
                 except Exception:
                     print('Erro ao enviar feedback')
-                break
+                Menu.limpar_terminal()
+                return menu_global.menu_config(usuario)
+            
 
             elif editar == '3':
                 Menu.limpar_terminal()
                 return menu_global.menu_config(usuario) 
             else:
                 print('Opção Inválida!')   
-    
+
     def registrar_compra(self, login_usuario, nome_produto, valor):
         '''
         Salva a compra no extrato.txt no formato:
