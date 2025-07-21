@@ -1,3 +1,9 @@
+from rich.console import Console
+from rich.panel import Panel
+import time
+
+console = Console()
+
 class Item:
     def __init__(self, nome, preco, estado, descricao, usuario):
         self.nome = nome
@@ -26,7 +32,8 @@ class Item:
         with open('listadeitens.txt', 'a', encoding='utf-8') as arquivo:
             arquivo.write(f'.{nova_numeracao}. {self.nome} | R${self.preco} | Estado (1 a 5): {self.estado} | {self.descricao} | \n\n')
 
-        print(f'\n✅ Item "{self.nome}" adicionado com sucesso!')
+        console.print(Panel(f'✅ Item "{self.nome}" adicionado com sucesso!', border_style="green", width=60))
+        time.sleep(1.5)
         menu_global.menu_principal(self.usuario)
 
 
@@ -49,7 +56,7 @@ class Item:
                     item = Item(nome_e_numero, preco, estado, descricao, usuario=None)  # Sem dono definido
                     itens.append(item)
         except FileNotFoundError:
-            print('Arquivo de itens não encontrado.')
+           console.print(Panel("❌ Arquivo de itens não encontrado.", border_style="red", width=60))
         return itens
 
     @classmethod
@@ -59,7 +66,10 @@ class Item:
             Para isso é necessário um nome, descrição, estado do item de 1 a 5 e preço.
             Após as entradas os dados são escritos no txt.        
         """
-        print('\n--- Lançar Novo Item ---')
+        from menu import Menu
+
+        Menu.limpar_terminal()
+        console.print(Panel("❌ Arquivo de itens não encontrado.", border_style="red", width=60))
         nome = input('Nome do item: ').strip()
         descricao = input('Descrição do item: ').strip()
 
@@ -67,7 +77,7 @@ class Item:
             estado = input('Estado do item (1 a 5): ').strip()
             if estado.isdigit() and 1 <= int(estado) <= 5:
                 break
-            print('Estado inválido. Digite um número entre 1 e 5.')
+            console.print(Panel("❌ Estado inválido. Digite um número entre 1 e 5.", border_style="red", width=60))
 
         while True:
             preco = input('Preço (R$): ').strip().replace(',', '.')
@@ -75,7 +85,7 @@ class Item:
                 float(preco)
                 break
             except ValueError:
-                print('Preço inválido. Digite um valor numérico.')
+                console.print(Panel("❌ Preço inválido. Digite um valor numérico.", border_style="red", width=60))
 
         # Criar instância do item e salvar
         item = cls(nome, preco, estado, descricao, usuario)
@@ -95,7 +105,7 @@ class Item:
                     if nome_item not in linha:
                         f.write(linha)
         except FileNotFoundError:
-            print('Arquivo listadeitens.txt não encontrado.')
+            console.print(Panel("❌ Arquivo listadeitens.txt não encontrado.", border_style="red", width=60))
 
 
     @staticmethod
@@ -111,11 +121,13 @@ class Item:
         itens = Item.carregar_itens()
 
         if not itens:
-            print('Nenhum item disponível.')
+            console.print(Panel("❌ Nenhum item disponível.", border_style="red", width=60))
+            time.sleep(1.5)
             return menu_global.menu_principal(usuario)
-
+        
+        console.print(Panel("[bold]Itens Disponíveis:[/bold]", title="🛒 COMPRAR ITEM", border_style="purple", width=60))
         for index, item in enumerate(itens, start=1):
-            print(f' .{index}. {item.nome.ljust(35)} | R${item.preco}')
+            console.print(f" .{index}. {item.nome.ljust(35)} | R${item.preco}")
         print(' .X. Voltar para o menu principal')
 
         while True:
@@ -123,44 +135,42 @@ class Item:
             if escolha == 'x':
                 return menu_global.menu_principal(usuario)
             if not escolha.isdigit() or int(escolha) < 1 or int(escolha) > len(itens):
-                print('Opção inválida.')
+                console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
                 continue
 
             index = int(escolha) - 1
             item_selecionado = itens[index]
             Menu.limpar_terminal()
             while True:
-                print(f'Item: {item_selecionado.nome}')
-                print('Mais informações:')
-                print(f'{item_selecionado.descricao}, Estado: {item_selecionado.estado}, Preço: R${item_selecionado.preco}')
-                opcao = input('1. Comprar\n2. Negociar com o vendedor\n3. Voltar\nOpção: ')
+                console.print(Panel(f"[bold]{item_selecionado.nome}[/bold]\n[dim]{item_selecionado.descricao}\nEstado: {item_selecionado.estado}   Preço: R${item_selecionado.preco}", title="📦 DETALHES DO ITEM", border_style="purple", width=60))
+                opcao = input('1 - Comprar\n2 - Negociar com o vendedor\n3 - Voltar\nOpção: ')
                 if opcao == '1':
                     Menu.limpar_terminal()
                     while True:
-                        print(f'Para comprar "{item_selecionado.nome}", faça o pix de R${item_selecionado.preco} para o pix: 704.514.384-26')
+                        console.print(Panel(f'Para comprar "{item_selecionado.nome}", faça o pix de R${item_selecionado.preco} para: [bold]704.514.384-26[/bold]', title="💰 PAGAMENTO", border_style="green", width=60))
                         confirmar = input('1. Confirmar compra\n2. Cancelar\nOpção: ')
                         if confirmar == '1':
-                            print('Email enviado! Venha para o Ceagri II para pegar seu item.')
+                            console.print(Panel("📧 Email enviado! Venha para o Ceagri II para pegar seu item.", border_style="green", width=60))
                             # Registra no extrato
                             try:
                                 preco_float = float(item_selecionado.preco.replace(',','.'))
                                 usuario_obj.registrar_compra(item_selecionado.nome, preco_float)
                             except Exception as e:
-                                print('Erro ao registrar no extrato:', e)
+                                console.print(Panel(f"Erro ao registrar no extrato: {e}", border_style="red", width=60))
                             # Remove do arquivo listadeitens.txt
                             try:
                                 Item.remover_item_do_arquivo(item_selecionado.nome)
                             except Exception as e:
-                                print('Erro ao remover item', e)
+                              console.print(Panel(f"Erro ao remover item: {e}", border_style="red", width=60))  
 
                             return menu_global.menu_principal(usuario)    
                         elif confirmar == '2':
                             Menu.limpar_terminal()
-                            print('Voltando...')
+                            console.print(Panel("Compra cancelada.", border_style="yellow", width=60))
                             break
                         else:
                             Menu.limpar_terminal()
-                            print('Opção inválida.')
+                            console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
                     break
                 elif opcao == '2':
                     Item.negociar(usuario, item_selecionado)
@@ -171,7 +181,7 @@ class Item:
                     break
                 else:
                     Menu.limpar_terminal()
-                    print('Opção inválida.')
+                    console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
             break
 
     @staticmethod
@@ -182,8 +192,8 @@ class Item:
         from sistema import menu_global
         from menu import Menu
 
-        print('Para negociar com o vendedor:')
-        print('1. Escrever email\n2. Ver contato\n3. Voltar')
+        console.print(Panel("Deseja negociar com o vendedor?", title="📨 NEGOCIAR", border_style="purple", width=60))
+        print('1 - Escrever email\n2 - Ver contato\n3 - Voltar')
         assunto = 'Um cliente do Bazar Brejó quer negociar com você!'
 
         while True:
@@ -191,7 +201,7 @@ class Item:
             if opcao == '1':
                 mensagem = input('Mensagem para o vendedor: ')
                 while True:
-                    print('1. Editar mensagem\n2. Enviar\n3. Cancelar')
+                    print('1 - Editar mensagem\n2 - Enviar\n3 - Cancelar')
                     editar = input('Opção: ')
                     if editar == '1':
                         print('Mensagem atual:', mensagem)
@@ -200,22 +210,22 @@ class Item:
                         Menu.limpar_terminal()
                         try:
                             item.usuario.enviar_email(usuario, 'jgsa1502@gmail.com', None, assunto, mensagem)
-                            print('Mensagem enviada! Uma cópia foi enviada ao seu e-mail.')
+                            console.print(Panel("✅ Mensagem enviada! Uma cópia foi enviada ao seu e-mail.", border_style="green", width=60))
                         except Exception:
-                            print('Erro ao enviar mensagem.')
+                            console.print(Panel("❌ Erro ao enviar mensagem.", border_style="red", width=60))
                         return
                     elif editar == '3':
                         Menu.limpar_terminal()
                         return menu_global.menu_config(usuario)
                     else:
-                        print('Opção inválida.')
+                        console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
             elif opcao == '2':
                 Menu.limpar_terminal()
-                print('Número de telefone do vendedor: [em desenvolvimento]')
+                console.print(Panel("📱 Número de telefone do vendedor: [em desenvolvimento]", border_style="yellow", width=60))
                 if input('Digite X para voltar: ').strip().upper() == 'X':
                     return menu_global.menu_principal(usuario)
             elif opcao == '3':
                 Menu.limpar_terminal()
                 return menu_global.menu_principal(usuario)
             else:
-                print('Opção inválida.')
+                console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
