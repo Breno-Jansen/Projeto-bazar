@@ -26,14 +26,14 @@ class Menu:
 
             texto_menu = (
             '[bold cyan]Para entrar no Bazar escolha uma opção:[/bold cyan]\n\n'
-            '1 - Cadastro\n'
-            '2 - Login'
+            '[bold white]1 - Cadastro[/bold white]\n'
+            '[bold white]2 - Login[/bold white]'
             )
 
             painel = Panel(texto_menu, title= '[bold white]MENU INICIAL[/bold white]', width=painel_width, border_style='purple')
             console.print(painel)
 
-            opcao_inicial = input('Digite a opção desejada: ').strip()
+            opcao_inicial = Prompt.ask('[bold white]Digite a opção desejada[/bold white]').strip()
             if opcao_inicial == '1':
                 self.menu_cadastro()
                 break
@@ -57,15 +57,15 @@ class Menu:
 
             texto_menu = (
             '[bold cyan]Para realizar o cadastro:[/bold cyan]\n\n'
-            '1 - Novo usuário\n'
-            '2 - Já tem conta? Faça o login\n'
-            'X - Voltar ao menu inicial'
+            '[bold white]1 - Novo usuário[/bold white]\n'
+            '[bold white]2 - Já tem conta? Faça o login[/bold white]\n'
+            '[bold white]X - Voltar ao menu inicial[/bold white]'
             )
 
             painel = Panel(texto_menu, title="[bold white]CADASTRO[/bold white]", width=painel_width, border_style='purple')
             console.print(painel)
 
-            opcao_menu_cadastro = input('Sua escolha: ').strip().lower()
+            opcao_menu_cadastro = Prompt.ask('[bold white]Sua escolha[/bold white]').strip().lower()
             if opcao_menu_cadastro == '1':
                 self.usuario.cadastrar()
                 break
@@ -93,14 +93,14 @@ class Menu:
 
             texto_menu = (
             '[bold cyan]Para realizar o login:[/bold cyan]\n\n'
-            '1 - Usuário e senha\n'
-            '2 - Esqueci a senha\n'
-            'X - Voltar ao menu inicial'
+            '[bold white]1 - Usuário e senha[/bold white]\n'
+            '[bold white]2 - Esqueci a senha[/bold white]\n'
+            '[bold white]X - Voltar ao menu inicial[/bold white]'
             )
 
             painel = Panel(texto_menu, title="[bold white]LOGIN[/bold white]", width=painel_width, border_style='purple')
             console.print(painel)
-            opcao_menu_login = input('Sua escolha: ').strip().lower()
+            opcao_menu_login = Prompt.ask('[bold white]Sua escolha[/bold white]').strip().lower()
             if opcao_menu_login == '1':
                 self.usuario.efetuar_login()
                 break
@@ -137,14 +137,14 @@ class Menu:
             titulo = '[bold magenta]BAZAR BREJÓ[/bold magenta]'   
             texto = (
                 '[bold cyan]BEM-VINDO AO BAZAR BREJÓ[/bold cyan]\n\n'
-                '1 - Acessar itens à venda\n'
-                '2 - Lançar item\n'
-                '3 - Configurações\n'
-                'X - Sair'
+                '[bold white]1 - Acessar itens à venda[/bold white]\n'
+                '[bold white]2 - Lançar item[/bold white]\n'
+                '[bold white]3 - Configurações[/bold white]\n'
+                '[bold white]X - Sair[/bold white]'
             )
             painel = Panel(texto, title = titulo, width = painel_width, border_style='purple')
             console.print(painel)
-            resposta_mp = Prompt.ask('[bold yellow]Digite a opção desejada: [/bold yellow]')
+            resposta_mp = Prompt.ask('[bold white]Digite a opção desejada: [/bold white]')
             if resposta_mp == '1':
                 self.limpar_terminal()
                 console.print('[bold green]Itens disponíveis[/bold green]')
@@ -191,16 +191,16 @@ class Menu:
 
             titulo = '[bold white]CONFIGURAÇÕES[/bold white]'
             texto = (
-                '1 - Feedback\n'
-                '2 - Mudar nome\n'
-                '3 - Mudar senha\n'
-                '4 - Excluir conta\n'
-                '5 - Ver extrato\n'
-                'X - Voltar'
+                '[bold white]1 - Feedback[/bold white]\n'
+                '[bold white]2 - Mudar nome[/bold white]\n'
+                '[bold white]3 - Mudar senha[/bold white]\n'
+                '[bold white]4 - Excluir conta[/bold white]\n'
+                '[bold white]5 - Ver extrato[/bold white]\n'
+                '[bold white]X - Voltar[/bold white]'
             )
             painel = Panel(texto, title = titulo, width = painel_width, border_style='purple')
             console.print(painel)
-            resposta_mc = Prompt.ask('[bold yellow]Digite a opção desejada: [/bold yellow]').strip().lower()
+            resposta_mc = Prompt.ask('[bold white]Digite a opção desejada: [/bold white]').strip().lower()
 
             if resposta_mc == '1':
                 self.limpar_terminal()

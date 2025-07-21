@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
 from rich.align import Align
+console = Console()
 
 class Usuario:
 
@@ -137,7 +138,7 @@ class Usuario:
             Após receber esses dados, os armazena em um arquivo chamado 'bancodedados.txt' e depois chama o login.
         '''
         from menu import Menu
-        console = Console()
+        
         Menu.limpar_terminal()
 
         console.print(Panel('[bold cyan]📝 Cadastro de novo usuário[/bold cyan]', title = '📋 CADASTRO', border_style = 'purple'))
@@ -178,7 +179,10 @@ class Usuario:
         '''
         from sistema import menu_global # Não pôde ser feito um import global para não dar erro circular entre os arquivos
         from menu import Menu
+        
         Menu.limpar_terminal() 
+        # Painel de login de e-mail
+        console.print(Panel('Digite seu e-mail de login', title='🔐 LOGIN DE USUÁRIO', border_style='purple'))
         # Login de usuário:
         usuario = self.login_usuario()
         # Login da senha:
@@ -187,30 +191,41 @@ class Usuario:
             usuarios = {}
             for line in arquivo:
                 partes = line.strip().split(',') 
-                if len(partes) == (3 or 4):   # Separa email da senha
+                if len(partes) >= 3:   # Separa email da senha
                     email = partes[1].strip()
                     senha = partes[2].strip()
                     usuarios[email] = senha
 
         if usuario not in usuarios: # Se usuário não tiver no banco de dados
             Menu.limpar_terminal()
-            print('Usuário não encontrado.')
+            console.print(Panel('[bold red]❌ Usuário não encontrado.[/bold red]', border_style='red'))
+            time.sleep(1.5)
             return                    
                 
         # Login da senha:
         while True: 
-            print('Login: Sua senha tem 8 caracteres')
+            console.print(Panel('Digite sua senha (8 caracteres)', title='🔑 LOGIN DE SENHA', border_style='purple'))
             senha_log = self.input_senha('Senha: ').strip() # Chamar criptografia
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_log == usuarios[usuario]:
                 Menu.limpar_terminal()
+                console.print(Panel(
+                    Align.center('[bold green]✅ Login realizado com sucesso![/bold green]\n\n[white]Redirecionando para o menu principal...[/white]', vertical='middle'),
+                    title='[bold green]✔️ Acesso Liberado[/bold green]',
+                    border_style='green',
+                    padding=(1, 4),
+                    width=60
+                ))
+                time.sleep(1.5)
                 menu_global.menu_principal(usuario)
                 return senha_log and usuario
                 
             else:
                 Menu.limpar_terminal()
-                print('Senha incorreta')
+                console.print(Panel('[bold red]❌ Senha incorreta. Tente novamente.[/bold red]', border_style='red'))
+                time.sleep(1.5)
+                
 
     def cadastro_nome(self):
         '''
@@ -220,7 +235,7 @@ class Usuario:
 
         '''
         from menu import Menu
-        console = Console()
+        
 
         console.print(Panel('Digite seu nome', title = '📝 CADASTRO DE NOME', border_style = 'purple'))
         while True:
@@ -243,7 +258,7 @@ class Usuario:
             Se email já está cadastrado repete o input para nova entrada.
         '''
         from menu import Menu
-        console = Console()
+        
 
         console.print(Panel('Digite seu e-mail de cadastro.\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', title = '📧 CADASTRO DE E-MAIL', border_style = 'purple'))
         
@@ -275,7 +290,7 @@ class Usuario:
             Se a senha não for a mesma na confirmação repete o input até ter confimação.
         '''
         from menu import Menu
-        console = Console()
+        
 
         while True:
             console.print(Panel('Sua senha deve conter 8 caracteres', title='🔒 Cadastro de Senha', border_style = 'purple'))
@@ -301,7 +316,7 @@ class Usuario:
             Cadastro opcional do número de Whatsapp com validação de 11 dígitos.
         '''
         from menu import Menu
-        console = Console()
+        
 
         console.print(Panel('Deseja cadastrar seu número de Whatsapp?', title='📱 Cadastro de Whatsapp', border_style='cyan'))
         print("1. Sim\n2. Não")
@@ -311,14 +326,14 @@ class Usuario:
                 console.print('Digite seu Whatsapp com DDD, apenas números. Ex: 81999999999')
                 numero_cd = input('Número: ').strip()
                 # Restricões do tamanho do número. Padrão (81) 912341234
-                if len(numero_cd) != 11:
-                    console.print('[bold red]❌ Número inválido.[/bold red] Deve conter 11 dígitos.')
-                else:
+                if len(numero_cd) == 11 and numero_cd.isdigit(): # isdigit usado para ver se to tem números
                     Menu.limpar_terminal()
                     console.print('[bold green]📲 Número cadastrado com sucesso![/bold green]')
                     return numero_cd
+                else:
+                    console.print('[bold red]❌ Número inválido.[/bold red] Deve conter 11 dígitos.')
         elif opcao_cd_numero == '2':
-            self.limpar_terminal
+            Menu.limpar_terminal()
             return "" # Precisa retornar o vazio.
         else:
             console.print('[bold red]❌ Opção inválida.[/bold red] Digite 1 ou 2.')
@@ -331,19 +346,22 @@ class Usuario:
             Se o email não estiver no txt repete o input até receber uma entrada válida.
         '''
         from menu import Menu
+        
         while True:
-            print('Login: digite seu e-mail:')
-            email_log = input('Usuário: ').strip()
+            email_log = Prompt.ask('[bold white]E-mail[/bold white]').strip()
 
             # Checar se o usuário está presente no arquivo
             with open('bancodedados.txt', 'r') as arquivo:
-                txt = arquivo.read()
-            if email_log in txt:
-                print('Usuário valido')
-                return email_log
-            else:
-                Menu.limpar_terminal()
-                print('Usuário inválido ou esse e-mail não está cadastrado')
+                emails = [linha.strip().split(',')[1] for linha in arquivo if len(linha.strip().split(',')) >= 2]
+
+                if email_log in emails:
+                    console.print(Panel('[bold green]✅ Usuário válido![/bold green]', border_style='green'))
+                    time.sleep(1.5)
+                    return email_log
+                else:
+                    Menu.limpar_terminal()
+                    console.print(Panel('[bold red]❌ E-mail inválido ou não cadastrado.[/bold red]', border_style='red'))
+                    time.sleep(1.5)
         
     def esqueci_senha(self):
         '''
@@ -354,31 +372,37 @@ class Usuario:
             Se o código não estiver correto, repete o input até confirmar o código.
         '''
         from menu import Menu
+        
         while True:
-            print('Login: digite seu e-mail para recuperar senha:')
-            email_log = input('Usuário: ').strip()
+            console.print(Panel('Digite seu e-mail para recuperar a senha', title='🔑 ESQUECI MINHA SENHA', border_style='purple'))
+            email_log = input('E-mail: ').strip()
 
             # Checar se o usuário está presente no arquivo
             with open('bancodedados.txt', 'r') as arquivo:
                 txt = arquivo.read()
             if email_log in txt:
-                print('Usuário valido')
-                print('Enviando email...')
+                console.print(Panel('[bold green]📨 Usuário encontrado. Enviando e-mail com código...[/bold green]', border_style='green'))
+                time.sleep(1.5)
                 codigo =  random.randint(100000,999999) 
                 conteudo = (f"Olá! Seu código de verificação é: {codigo}")
                 self.enviar_email(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
                 while True:
-                    codigo_input = input('digite o código enviado ao seu email: ').strip()
+                    Menu.limpar_terminal()
+                    console.print(Panel('Digite o código enviado para seu e-mail', title='📩 CÓDIGO DE VERIFICAÇÃO', border_style='purple'))
+                    codigo_input = input('Código: ').strip()
                     if codigo_input == str(codigo):
-                        print('Código correto. Agora crie uma senha nova')
+                        console.print(Panel('[bold green]✅ Código correto![/bold green] Redefina sua senha.', border_style='green'))
+                        time.sleep(1)
                         self.mudar_senha_esqueci(email_log)
                         return codigo_input and email_log
                     else:
-                        print('Código incorreto')
+                        console.print(Panel('[bold red]❌ Código incorreto. Tente novamente.[/bold red]', border_style='red'))
+                        time.sleep(1.5)
                     
             else:
                 Menu.limpar_terminal()
-                print('Usuário inválido ou esse e-mail não está cadastrado')
+                console.print(Panel('[bold red]❌ E-mail não encontrado no sistema.[/bold red]', border_style='red'))
+                time.sleep(1.5)
 
         
     def mudar_senha_esqueci(self, usuario):
@@ -393,9 +417,11 @@ class Usuario:
         '''
         from sistema import menu_global
         from menu import Menu
+        
 
         Menu.limpar_terminal()
-        print('Código correto')
+        console.print(Panel('Digite sua nova senha (8 caracteres)', title='🔒 REDEFINIR SENHA', border_style='purple'))
+
         senha_nova = self.input_senha('Nova senha: ').strip()
 
         # Lê todas as linhas do arquivo
@@ -426,11 +452,13 @@ class Usuario:
             # Só reescreve o arquivo após o loop completo
             with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                 arquivo.writelines(nova_lista)
-            print('Senha atualizada com sucesso!')
+            console.print(Panel('[bold green]🔓 Senha redefinida com sucesso![/bold green] Redirecionando para o menu principal...', border_style='green'))
+            time.sleep(1.5)
             menu_global.menu_principal(usuario)
 
         else:
-            print('Erro: e-mail não encontrado.')
+            console.print(Panel('[bold red]❌ Erro: e-mail não encontrado para redefinir senha.[/bold red]', border_style='red'))
+            time.sleep(1.5)
             Menu.menu_inicial()
 
     def mudar_nome_config(self, usuario):
@@ -449,6 +477,7 @@ class Usuario:
         '''
         from sistema import menu_global
         from menu import Menu
+        
         # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
         with open('bancodedados.txt', 'r') as arquivo:
             usuarios = {}
@@ -462,17 +491,19 @@ class Usuario:
 
         # confirmação da senha:
         while True: 
-            print('Digite sua senha atual: Sua senha tem 8 caracteres')
+            console.print(Panel('Digite sua senha atual\n[dim]Sua senha tem 8 caracteres[/dim]', title='🔐 Confirmação de Senha', border_style='purple'))
             senha_cadastrada = self.input_senha('Sua senha: ').strip()
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_cadastrada == usuarios.get(usuario):
                 Menu.limpar_terminal()
-                print('Senha correta')
+                console.print(Panel('[bold green]Senha correta![/bold green]', border_style='green'))
+                time.sleep(1.2)
                 break            
             else:
                 Menu.limpar_terminal()
-                print('Senha incorreta')
+                console.print(Panel('[bold red]❌ Senha incorreta.[/bold red]', border_style='red'))
+                time.sleep(1.2)
 
         nome_usuario = None
 
@@ -488,9 +519,11 @@ class Usuario:
                         break  # achou a linha do usuario e para
 
         if nome_usuario:
-            print(f'nome atual: {nome_usuario}')
+            console.print(f'[bold white]Nome atual:[/bold white] {nome_usuario}')
         else:
-            print('Erro: usuário não encontrado.')
+            console.print(Panel('[bold red]Erro: usuário não encontrado.[/bold red]', border_style='red'))
+            return
+
 
         nome_novo = input('Novo nome: ')
         # Lê todas as linhas do arquivo
@@ -519,11 +552,13 @@ class Usuario:
         if nome_trocado:
             with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                 arquivo.writelines(nova_lista_nome)
-            print('Nome atualizado com sucesso!')
+            console.print(Panel('[bold green]✅ Nome atualizado com sucesso![/bold green]', border_style='green'))
+            time.sleep(1.5)
             menu_global.menu_principal(usuario)
         else:
             Menu.limpar_terminal()
-            print('Erro: e-mail não encontrado.')
+            console.print(Panel('[bold red]❌ Erro: e-mail não encontrado.[/bold red]', border_style='red'))
+            time.sleep(1.5)
             menu_global.menu_principal(usuario)
 
         
@@ -556,19 +591,21 @@ class Usuario:
                 
         # confirmação da senha:
         while True: 
-            print('Digite sua senha atual: Sua senha tem 8 caracteres')
-            senha_cadastrada = self.input_senha('Sua senha: ').strip() # Chamar criptografia
+            Menu.limpar_terminal()
+            console.print(Panel('Digite sua senha atual\n[dim]A senha deve conter 8 caracteres[/dim]', title='🔐 CONFIRMAÇÃO DE SENHA', border_style='purple'))
+            senha_cadastrada = self.input_senha('[bold white]Sua senha:[/bold white] ').strip() # Chamar criptografia
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_cadastrada == usuarios[usuario]:
                 Menu.limpar_terminal()
-                print('Senha correta')
+                console.print('[bold green]Senha correta![/bold green]', border_style='green')
+                time.sleep(1.2)
                 break            
             else:
                 Menu.limpar_terminal()
-                print('Senha incorreta')
+                console.print('[bold red]❌ Senha incorreta.[/bold red]', border_style='red')
 
-        senha_nova = self.input_senha('Nova senha: ').strip()
+        senha_nova = self.input_senha('[bold white]Nova senha:[/bold white]').strip()
 
         # Lê todas as linhas do arquivo
         with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
@@ -599,10 +636,11 @@ class Usuario:
             # Só reescreve o arquivo após o loop completo
             with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                 arquivo.writelines(nova_lista_senha)
-            print('Senha atualizada com sucesso!')
+            console.print(Panel('[bold green]✅ Senha atualizada com sucesso![/bold green]', border_style='green'))
+            time.sleep(1.5)
             menu_global.menu_principal(usuario)
         else:
-            print('Erro: e-mail não encontrado.')
+            console.print('[bold red]❌ Erro: e-mail não encontrado[/bold red]',border_style='red')
 
     def excluir_conta(self, usuario):
         '''
@@ -619,35 +657,40 @@ class Usuario:
         '''
         from sistema import menu_global
         from menu import Menu
-        print('Você realmente deseja excluir sua conta? \n1. Sim \n2. Não, voltar')
+        console.print(Panel('[bold red]⚠️ Atenção![/bold red]\nEssa ação irá excluir sua conta permanentemente!', title='❌ Excluir Conta', border_style='red'))
+        console.print('[bold white]Você realmente deseja excluir sua conta?[/bold white]')
+        console.print('[bold white]1 - Sim\n2 - Não, voltar[/bold white]')
         resposta_ec = input('Digite a opção desejada: ')
         conta_excluida = False
         while True:
             if resposta_ec == '1':
             # Lê todas as linhas do arquivo
                 email_excluir = str(usuario)
-                print(email_excluir)
+                
                 with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
                     linhas = arquivo.readlines()
                 
-
                 nova_lista_conta = [linha for linha in linhas if linha.strip().split(',')[1] != email_excluir]
                 if len(nova_lista_conta) == len(linhas):
-                    print('Usuário não encontrado')
+                    console.print(Panel('[bold red]❌ Usuário não encontrado.[/bold red]', border_style='red'))
+                    time.sleep(1.2)
                 else:
                     conta_excluida = True
                     with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                         arquivo.writelines(nova_lista_conta)
-                    print("Excluindo conta\nLimpando a tela em:")
+                    console.print('\n[bold red]Excluindo conta...[/bold red]')
                     for i in range(3, 0, -1):
-                        print(f"{i}...")
+                        console.print(f'[dim]Limpando em: {i}...[/dim]')
                         time.sleep(1)
-                        Menu.limpar_terminal()
+                    Menu.limpar_terminal()
                 
                 if conta_excluida:
-                    print('Conta exluída com sucesso!')
+                    console.print(Panel('[bold green]✅ Conta excluída com sucesso![/bold green]', border_style='green'))
+                    time.sleep(1.5)
+                    
                 else:
-                    print('Erro ao encontrar email. Tente novamente') 
+                    console.print(Panel('[bold red]❌ Erro ao encontrar o e-mail. Tente novamente.[/bold red]', border_style='red'))
+                    time.sleep(1.5)
                     menu_global.menu_config(usuario)
                 break
 
@@ -657,7 +700,8 @@ class Usuario:
                 break
             else:
                 Menu.limpar_terminal()
-                print('Opção inválida')    
+                console.print(Panel('[bold red]❌ Opção inválida. Digite 1 ou 2.[/bold red]', border_style='red')) 
+                resposta_ec = input('Digite novamente: ').strip()  
 
 
     def feedback(self, usuario):
@@ -674,7 +718,7 @@ class Usuario:
         '''
         from sistema import menu_global
         from menu import Menu
-        console =  Console()
+        
         # Achar e-mail do usuario
         email_feedback = None
         with open('bancodedados.txt', 'r') as arquivo:
@@ -776,7 +820,6 @@ class Usuario:
         from menu import Menu
         
         
-        console = Console()
         try:
             with open('extrato.txt', 'r', encoding='utf-8') as f:
                 linhas = f.readlines()
