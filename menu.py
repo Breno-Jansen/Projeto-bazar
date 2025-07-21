@@ -30,7 +30,7 @@ class Menu:
             '2 - Login'
             )
 
-            painel = Panel(texto_menu, title= '[bold magenta]MENU INICIAL[/bold magenta]', width=painel_width)
+            painel = Panel(texto_menu, title= '[bold white]MENU INICIAL[/bold white]', width=painel_width, border_style='purple')
             console.print(painel)
 
             opcao_inicial = input('Digite a opção desejada: ').strip()
@@ -62,7 +62,7 @@ class Menu:
             'X - Voltar ao menu inicial'
             )
 
-            painel = Panel(texto_menu, title="[bold magenta]CADASTRO[/bold magenta]", width=painel_width)
+            painel = Panel(texto_menu, title="[bold white]CADASTRO[/bold white]", width=painel_width, border_style='purple')
             console.print(painel)
 
             opcao_menu_cadastro = input('Sua escolha: ').strip().lower()
@@ -98,7 +98,7 @@ class Menu:
             'X - Voltar ao menu inicial'
             )
 
-            painel = Panel(texto_menu, title="[bold magenta]LOGIN[/bold magenta]", width=painel_width)
+            painel = Panel(texto_menu, title="[bold white]LOGIN[/bold white]", width=painel_width, border_style='purple')
             console.print(painel)
             opcao_menu_login = input('Sua escolha: ').strip().lower()
             if opcao_menu_login == '1':
@@ -142,7 +142,7 @@ class Menu:
                 '3 - Configurações\n'
                 'X - Sair'
             )
-            painel = Panel(texto, title = titulo, width = painel_width)
+            painel = Panel(texto, title = titulo, width = painel_width, border_style='purple')
             console.print(painel)
             resposta_mp = Prompt.ask('[bold yellow]Digite a opção desejada: [/bold yellow]')
             if resposta_mp == '1':
@@ -189,7 +189,7 @@ class Menu:
             width = console.size.width
             painel_width = max(50, min(80, width - 10))
 
-            titulo = '[bold magenta]CONFIGURAÇÕES[/bold magenta]'
+            titulo = '[bold white]CONFIGURAÇÕES[/bold white]'
             texto = (
                 '1 - Feedback\n'
                 '2 - Mudar nome\n'
@@ -198,7 +198,7 @@ class Menu:
                 '5 - Ver extrato\n'
                 'X - Voltar'
             )
-            painel = Panel(texto, title = titulo, width = painel_width)
+            painel = Panel(texto, title = titulo, width = painel_width, border_style='purple')
             console.print(painel)
             resposta_mc = Prompt.ask('[bold yellow]Digite a opção desejada: [/bold yellow]').strip().lower()
 

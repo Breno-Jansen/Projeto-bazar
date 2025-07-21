@@ -8,15 +8,12 @@ from email.mime.text import MIMEText # Função para criar o conteúdo de texto 
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
+from rich.align import Align
 
 class Usuario:
 
-    def __init__(self, nome=None, email=None, senha=None, numero=None):
-        self.nome = nome
-        self.email = email
-        self.senha = senha
-        self.numero = numero 
-
+    def __init__(self):
+        pass        
     def input_senha(self, prompt = 'Senha: '): # Senha com asteriscos
     
         '''
@@ -140,20 +137,35 @@ class Usuario:
             Após receber esses dados, os armazena em um arquivo chamado 'bancodedados.txt' e depois chama o login.
         '''
         from menu import Menu
+        console = Console()
         Menu.limpar_terminal()
-        # Cadastro do nome
-        self.nome = self.cadastro_nome()
-        # Cadastro do usuário
-        self.email = self.cadastro_usuario()
-        # Cadastro da senha
-        self.senha = self.cadastro_senha()
-        # Cadastro do Whatsapp
-        self.numero = self.cadastro_numero()
 
+        console.print(Panel('[bold cyan]📝 Cadastro de novo usuário[/bold cyan]', title = '📋 CADASTRO', border_style = 'purple'))
+        
+        # Cadastro do usuário
+        nome_cd = self.cadastro_nome()
+        email_cd = self.cadastro_usuario()
+        # Cadastro da senha
+        senha_cd = self.cadastro_senha()
+        # Cadastro do Whatsapp
+        numero_cd = self.cadastro_numero()
         # Escrever todos os cadastros no bancodedados.txt
         with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-            arquivo.write(f'{self.nome},{self.email},{self.senha},{self.numero}\n')
+            arquivo.write(f'{nome_cd},{email_cd},{senha_cd},{numero_cd}\n')
         # Ir para o login após cadastro
+        Menu.limpar_terminal()
+        console.print(Panel(
+            Align.center(
+                '[bold green]✅ Cadastro realizado com sucesso![/bold green]\n\n[white]Redirecionando para o login...[/white]',
+                vertical='middle'
+
+            ),
+            title = '[bold green]✔️ Tudo certo![/bold green]',
+            border_style = 'green',
+            padding = (1, 4),
+            width = 60
+        ))
+        time.sleep(2)
         self.efetuar_login()
 
     def efetuar_login(self):
@@ -168,28 +180,37 @@ class Usuario:
         from menu import Menu
         Menu.limpar_terminal() 
         # Login de usuário:
-        email_input = self.login_usuario()
-
+        usuario = self.login_usuario()
+        # Login da senha:
+        # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
         with open('bancodedados.txt', 'r') as arquivo:
-            for linha in arquivo:
-                partes = linha.strip().split(',')
-                if len(partes) >= 3:
-                    nome, email, senha = partes[:3]
-                    numero = partes[3] if len(partes) == 4 else ""
-                    if email == email_input:
-                        while True:
-                            senha_log = self.input_senha('Senha: ').strip()
-                            if senha_log == senha:
-                                self.nome = nome
-                                self.email = email
-                                self.senha = senha
-                                self.numero = numero
-                                Menu.limpar_terminal()
-                                menu_global.menu_principal(self.email)
-                                return
-                            else:
-                                Menu.limpar_terminal()
-                                print('Senha incorreta')
+            usuarios = {}
+            for line in arquivo:
+                partes = line.strip().split(',') 
+                if len(partes) == (3 or 4):   # Separa email da senha
+                    email = partes[1].strip()
+                    senha = partes[2].strip()
+                    usuarios[email] = senha
+
+        if usuario not in usuarios: # Se usuário não tiver no banco de dados
+            Menu.limpar_terminal()
+            print('Usuário não encontrado.')
+            return                    
+                
+        # Login da senha:
+        while True: 
+            print('Login: Sua senha tem 8 caracteres')
+            senha_log = self.input_senha('Senha: ').strip() # Chamar criptografia
+
+            # Se a senha for a mesma da linha do usuário no banco de dados
+            if senha_log == usuarios[usuario]:
+                Menu.limpar_terminal()
+                menu_global.menu_principal(usuario)
+                return senha_log and usuario
+                
+            else:
+                Menu.limpar_terminal()
+                print('Senha incorreta')
 
     def cadastro_nome(self):
         '''
@@ -199,14 +220,16 @@ class Usuario:
 
         '''
         from menu import Menu
-        print('Digite seu nome')
+        console = Console()
+
+        console.print(Panel('Digite seu nome', title = '📝 CADASTRO DE NOME', border_style = 'purple'))
         while True:
             nome_cd = input('Nome: ').strip()
             # Checar se nome já é cadastrado
             with open('bancodedados.txt', 'r') as arquivo:
                 usuarios = arquivo.read()
             if nome_cd in usuarios:
-                print('Esse nome já foi usado')
+                console.print('[bold red]Esse nome já foi usado. Tente outro.[/bold red]')
             else:
                 Menu.limpar_terminal()
                 return nome_cd
@@ -220,27 +243,29 @@ class Usuario:
             Se email já está cadastrado repete o input para nova entrada.
         '''
         from menu import Menu
-        print ('Cadastro : digite o usuário (e-mail)')
-        print ('O usuário precisa terminar com @gmail.com ou @ufrpe.br')
+        console = Console()
+
+        console.print(Panel('Digite seu e-mail de cadastro.\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', title = '📧 CADASTRO DE E-MAIL', border_style = 'purple'))
+        
         while True:
-            email_cd = input ('Usuário: ').strip().lower()
+            email_cd = input ('E-mail: ').strip().lower()
             email_arroba = email_cd.split('@')
             # Restrição de e-mails para o usuário: @ e terminar com entradas válidas
             if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
                 Menu.limpar_terminal()
-                print('Usuário válido')
+                console.print('[bold green]E-mail válido[/bold green]')
                 # Checar se usuário já é cadastrado
                 with open('bancodedados.txt', 'r') as arquivo:
                     usuarios = arquivo.read()
                 if email_cd in usuarios:
                     Menu.limpar_terminal()
-                    print('Usuário já cadastrado, Insira outro e-mail!')
+                    console.print('[bold red]❌ E-mail já cadastrado[/bold red], Insira outro e-mail!')
                 else:
                     Menu.limpar_terminal()
                     return email_cd
             else:
                 Menu.limpar_terminal()
-                print('Usuário inválido. E-mails aceitos: @ufrpe.br ou @gmail.com')
+                console.print('[bold red]❌ E-mail inválido.[/bold red] E-mails aceitos: @ufrpe.br ou @gmail.com')
 
     def cadastro_senha(self):
         '''
@@ -250,49 +275,54 @@ class Usuario:
             Se a senha não for a mesma na confirmação repete o input até ter confimação.
         '''
         from menu import Menu
+        console = Console()
+
         while True:
-            print('Sua senha precisa ter 8 caracteres')
+            console.print(Panel('Sua senha deve conter 8 caracteres', title='🔒 Cadastro de Senha', border_style = 'purple'))
             senha_cd = self.input_senha('Senha: ').strip()
             
             # Restrição do tamanho da senha
             if len(senha_cd) != 8:
                 Menu.limpar_terminal()
-                print('senha inválida.')
+                console.print('[bold red]❌ Senha inválida.[/bold red] Deve conter 8 caracteres.')
             # Confirmação da senha
             else:
                 senha_2 = self.input_senha('Confirme a senha: ').strip()
                 if senha_cd == senha_2:
                     Menu.limpar_terminal()
-                    print('Senha cadastrada!') 
+                    console.print('[bold green]🔓 Senha cadastrada com sucesso![/bold green]') 
                     return senha_cd
                 else:
                     Menu.limpar_terminal()
-                    print('As senhas precisam ser idênticas.')
+                    console.print('[bold red]❌ As senhas não coincidem.[/bold red]')
 
     def cadastro_numero(self):
         '''
-        Fazer a docstring...
+            Cadastro opcional do número de Whatsapp com validação de 11 dígitos.
         '''
         from menu import Menu
+        console = Console()
 
-        print('Deseja cadastrar seu Whatsapp?\n1. Sim\n2. Não')
+        console.print(Panel('Deseja cadastrar seu número de Whatsapp?', title='📱 Cadastro de Whatsapp', border_style='cyan'))
+        print("1. Sim\n2. Não")
         opcao_cd_numero = input('Digite: ')
         if opcao_cd_numero == '1':
             while True:
-                print('Digite seu Whatsapp, apenas números!')
+                console.print('Digite seu Whatsapp com DDD, apenas números. Ex: 81999999999')
                 numero_cd = input('Número: ').strip()
                 # Restricões do tamanho do número. Padrão (81) 912341234
                 if len(numero_cd) != 11:
-                    print('Número inválido. Padrão => 81983548906')
+                    console.print('[bold red]❌ Número inválido.[/bold red] Deve conter 11 dígitos.')
                 else:
                     Menu.limpar_terminal()
-                    print('Número Cadastrado')
+                    console.print('[bold green]📲 Número cadastrado com sucesso![/bold green]')
                     return numero_cd
         elif opcao_cd_numero == '2':
-            Menu.limpar_terminal()
+            self.limpar_terminal
             return "" # Precisa retornar o vazio.
         else:
-            print('Opção Inválida! Digite 1 ou 2.')
+            console.print('[bold red]❌ Opção inválida.[/bold red] Digite 1 ou 2.')
+            return self.cadastro_numero()
             
         
     def login_usuario(self):
@@ -679,7 +709,6 @@ class Usuario:
                 console.print('[bold blue]Enviando e-mail...[/bold blue]')
                 try:
                     self.enviar_email(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
-                    from rich.align import Align
 
                     msg_comprovante = Panel(
                         Align.center(
@@ -705,27 +734,28 @@ class Usuario:
             else:
                 print('Opção Inválida!')   
 
-    def registrar_compra(self, nome_produto, valor):
+    def registrar_compra(self, login_usuario, nome_produto, valor):
         '''
         Salva a compra no extrato.txt no formato:
         email: item1 | item2 | item3 ...
         '''
 
-        from datetime import datetime
+        from datetime import datetime # Import para usar o datetime.now, registra a data e hora atual
+
         data = datetime.now().strftime('%d-%m-%Y %H:%M')
-        nova_entrada = f'{nome_produto} - R${valor:.2f} ({data})'
-    
+        nova_entrada = (f'{nome_produto} - R${valor:.2f} ({data})')
+
         try:
-            with open('extrato.txt', 'r', encoding='utf-8') as f:
+            with open('extrato.txt', 'r', encoding= 'utf-8') as f:
                 linhas = f.readlines()
         except FileNotFoundError:
             linhas = []
-    
+        
         nova_linha = []
         usuario_encontrado = False
-    
+
         for linha in linhas:
-            if linha.startswith(f'{self.email}:'):
+            if linha.startswith(f'{login_usuario}:'):
                 usuario_encontrado = True
                 linha = linha.strip()
                 if not linha.endswith('|'):
@@ -734,12 +764,13 @@ class Usuario:
                 nova_linha.append(linha + '\n')
             else:
                 nova_linha.append(linha)
-    
+
         if not usuario_encontrado:
-            nova_linha.append(f'{self.email}: {nova_entrada} |\n')
-    
+            nova_linha.append(f'{login_usuario}: {nova_entrada} |\n')
+
         with open('extrato.txt', 'w', encoding='utf-8') as f:
-            f.writelines(nova_linha)    
+            f.writelines(nova_linha)
+    
     def mostrar_extrato(self, usuario):
         from sistema import menu_global
         from menu import Menu
@@ -776,4 +807,3 @@ class Usuario:
                 Menu.limpar_terminal()
                 menu_global.menu_config(usuario)
                 break
-
