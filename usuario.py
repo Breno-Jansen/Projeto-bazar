@@ -15,7 +15,7 @@ class Usuario:
 
     def __init__(self):
         pass        
-    def input_senha(self, prompt = 'Senha: '): # Senha com asteriscos
+    def InputSenha(self, prompt = 'Senha: '): # Senha com asteriscos
     
         '''
             Faz a criptografia da senha no terminal, tanto para o sistema windows quanto para Mac e Linux.
@@ -82,7 +82,7 @@ class Usuario:
 
             # Validação da senha            
                 if len(senha) != 8:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     print('Senha inválida. Ela deve ter exatamente 8 caracteres')
                     continue
                 else:
@@ -94,7 +94,7 @@ class Usuario:
 
 
 
-    def enviar_email(self, destinatario1, destinatario2, destinatario3, assunto, conteudo):
+    def EnviarEmail(self, destinatario1, destinatario2, destinatario3, assunto, conteudo):
         '''
             Aqui o programa envia uma mensagem com o código aleatório para o usuário
             O código  é enviado pelo email brenojaccioly@gmail.com (um dos criadores do Bazar) com a senha_app do google.
@@ -103,7 +103,7 @@ class Usuario:
                 usuario (email_log): o email do login do esqueci a senha.
                 codigo (codigo): codigo de 6 dígitos aleatório.
             
-            Tenta enviar código pela internet, se não conseguir, exibe mensagem de erro e volta ao menu_login().
+            Tenta enviar código pela internet, se não conseguir, exibe mensagem de erro e volta ao MenuLogin().
         '''
         from menu import Menu
 
@@ -125,36 +125,37 @@ class Usuario:
             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
                 smtp.login(email_remetente, senha_app)
                 smtp.send_message(msg)
-            console.print('[bold green]Email enviado com sucesso![/bold green]')
+            print("Email enviado com sucesso!")
         except Exception as e:
-            console.print('[bold red]Erro ao enviar email, verifique acesso à internet ou se o email de fato existe:[/bold red]', e)
-            Menu.menu_login()
+            print("Erro ao enviar email, verifique acesso à internet ou se o email de fato existe:", e)
+            Menu.MenuLogin()
 
     
-    def cadastrar(self):
+    def Cadastrar(self):
         '''
             Aqui é onde o CRUD começa de fato. Essa função recebe as entradas: nome, email e senha.
-            Essas entradas vem de cadastro_nome, cadastro_usuario e cadastro_senha respectivamente.
+            Essas entradas vem de CadastroNome, CadastroUsuario e CadastroSenha respectivamente.
             Após receber esses dados, os armazena em um arquivo chamado 'bancodedados.txt' e depois chama o login.
         '''
         from menu import Menu
         
-        Menu.limpar_terminal()
+        Menu.LimparTerminal()
 
-        console.print(Panel('[bold cyan]📝 Cadastro de novo usuário[/bold cyan]', title = '📋 CADASTRO', border_style = 'purple', width=60))
+        console.print(Panel('[bold cyan]📝 Cadastro de novo usuário[/bold cyan]', title = '📋 CADASTRO', border_style = 'purple'))
         
-        # Cadastro do usuário
-        nome_cd = self.cadastro_nome()
-        email_cd = self.cadastro_usuario()
+        # Cadastro do nome
+        nome_cd = self.CadastroNome()
+        # Cadastro do email
+        email_cd = self.CadastroUsuario()
         # Cadastro da senha
-        senha_cd = self.cadastro_senha()
+        senha_cd = self.CadastroSenha()
         # Cadastro do Whatsapp
-        numero_cd = self.cadastro_numero()
+        numero_cd = self.CadastroNumero()
         # Escrever todos os cadastros no bancodedados.txt
         with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
             arquivo.write(f'{nome_cd},{email_cd},{senha_cd},{numero_cd}\n')
         # Ir para o login após cadastro
-        Menu.limpar_terminal()
+        Menu.LimparTerminal()
         console.print(Panel(
             Align.center(
                 '[bold green]✅ Cadastro realizado com sucesso![/bold green]\n\n[white]Redirecionando para o login...[/white]',
@@ -167,11 +168,11 @@ class Usuario:
             width = 60
         ))
         time.sleep(2)
-        self.efetuar_login()
+        self.EfetuarLogin()
 
-    def efetuar_login(self):
+    def EfetuarLogin(self):
         '''
-            Essa função recebe a entrada do usuário pelo login_usuario e o localiza no bancodedados.txt.
+            Essa função recebe a entrada do usuário pelo LoginUsuario e o localiza no bancodedados.txt.
             Após a leitura, o email é separado da senha pelo .split(',').
             Depois compara a senha com o input senha_log para verificar se a senha está correta.
             Se o usuário não estiver no banco de dados ele retorna. 
@@ -180,11 +181,11 @@ class Usuario:
         from sistema import menu_global # Não pôde ser feito um import global para não dar erro circular entre os arquivos
         from menu import Menu
         
-        Menu.limpar_terminal() 
+        Menu.LimparTerminal() 
         # Painel de login de e-mail
-        console.print(Panel('Digite seu e-mail de login', title='🔐 LOGIN DE USUÁRIO', border_style='purple', width=60))
+        console.print(Panel('Digite seu e-mail de login', title='🔐 LOGIN DE USUÁRIO', border_style='purple'))
         # Login de usuário:
-        usuario = self.login_usuario()
+        usuario = self.LoginUsuario()
         # Login da senha:
         # lendo linhas do banco de dados como {email: senha} (arquivo .txt)
         with open('bancodedados.txt', 'r') as arquivo:
@@ -197,19 +198,19 @@ class Usuario:
                     usuarios[email] = senha
 
         if usuario not in usuarios: # Se usuário não tiver no banco de dados
-            Menu.limpar_terminal()
-            console.print(Panel('[bold red]❌ Usuário não encontrado.[/bold red]', border_style='red', width=60))
+            Menu.LimparTerminal()
+            console.print(Panel('[bold red]❌ Usuário não encontrado.[/bold red]', border_style='red'))
             time.sleep(1.5)
             return                    
                 
         # Login da senha:
         while True: 
-            console.print(Panel('Digite sua senha (8 caracteres)', title='🔑 LOGIN DE SENHA', border_style='purple', width=60))
-            senha_log = self.input_senha('Senha: ').strip() # Chamar criptografia
+            console.print(Panel('Digite sua senha (8 caracteres)', title='🔑 LOGIN DE SENHA', border_style='purple'))
+            senha_log = self.InputSenha('Senha: ').strip() # Chamar criptografia
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_log == usuarios[usuario]:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel(
                     Align.center('[bold green]✅ Login realizado com sucesso![/bold green]\n\n[white]Redirecionando para o menu principal...[/white]', vertical='middle'),
                     title='[bold green]✔️ Acesso Liberado[/bold green]',
@@ -218,16 +219,16 @@ class Usuario:
                     width=60
                 ))
                 time.sleep(1.5)
-                menu_global.menu_principal(usuario)
+                menu_global.MenuPrincipal(usuario)
                 return senha_log and usuario
                 
             else:
-                Menu.limpar_terminal()
-                console.print(Panel('[bold red]❌ Senha incorreta. Tente novamente.[/bold red]', border_style='red', width=60))
+                Menu.LimparTerminal()
+                console.print(Panel('[bold red]❌ Senha incorreta. Tente novamente.[/bold red]', border_style='red'))
                 time.sleep(1.5)
                 
 
-    def cadastro_nome(self):
+    def CadastroNome(self):
         '''
             Nessa função o nome do usuario é a entrada que vai ser retornada ao cadastro.
             Antes de retornar, confere se o nome já está em uso lendo o bancodedados.txt.
@@ -237,19 +238,19 @@ class Usuario:
         from menu import Menu
         
 
-        console.print(Panel(Align.center('Digite seu nome', title = '📝 CADASTRO DE NOME', border_style = 'purple', width=60)))
+        console.print(Panel('Digite seu nome', title = '📝 CADASTRO DE NOME', border_style = 'purple'))
         while True:
             nome_cd = input('Nome: ').strip()
             # Checar se nome já é cadastrado
             with open('bancodedados.txt', 'r') as arquivo:
                 usuarios = arquivo.read()
             if nome_cd in usuarios:
-                console.print(Panel(Align.center('[bold red]❌ Esse nome já foi usado. Tente outro.[/bold red]', vertical="middle"), border_style='red', width=60))
+                console.print('[bold red]Esse nome já foi usado. Tente outro.[/bold red]')
             else:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 return nome_cd
 
-    def cadastro_usuario(self):
+    def CadastroUsuario(self):
         '''
             Nessa função o email do usuario é a entrada que vai ser retornada ao cadastro.
             Restringe a entrada para conter um email válido: @ufrpe.br ou @gmail.com
@@ -260,29 +261,29 @@ class Usuario:
         from menu import Menu
         
 
-        console.print(Panel(Align.center('Digite seu e-mail de cadastro.\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', vertical="middle"), title='📧 CADASTRO DE E-MAIL', border_style='purple', width=60))
+        console.print(Panel('Digite seu e-mail de cadastro.\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', title = '📧 CADASTRO DE E-MAIL', border_style = 'purple'))
         
         while True:
             email_cd = input ('E-mail: ').strip().lower()
             email_arroba = email_cd.split('@')
             # Restrição de e-mails para o usuário: @ e terminar com entradas válidas
             if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print('[bold green]E-mail válido[/bold green]')
                 # Checar se usuário já é cadastrado
                 with open('bancodedados.txt', 'r') as arquivo:
                     usuarios = arquivo.read()
                 if email_cd in usuarios:
-                    Menu.limpar_terminal()
-                    console.print(Panel(Align.center('[bold red]❌ E-mail já cadastrado. Insira outro e-mail![/bold red]', vertical="middle"), border_style='red', width=60))
+                    Menu.LimparTerminal()
+                    console.print('[bold red]❌ E-mail já cadastrado[/bold red], Insira outro e-mail!')
                 else:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     return email_cd
             else:
-                Menu.limpar_terminal()
-                console.print(Panel(Align.center('[bold red]❌ E-mail inválido.[/bold red]\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', vertical="middle"), border_style='red', width=60))
+                Menu.LimparTerminal()
+                console.print('[bold red]❌ E-mail inválido.[/bold red] E-mails aceitos: @ufrpe.br ou @gmail.com')
 
-    def cadastro_senha(self):
+    def CadastroSenha(self):
         '''
             Aqui recebe-se a entrada da senha do cadastro com confirmação.
             As restrinções são o tamanho (precisa conter 8 caracteres) e a tecla de espaço.
@@ -293,54 +294,54 @@ class Usuario:
         
 
         while True:
-            console.print(Panel(Align.center('Sua senha deve conter 8 caracteres', vertical="middle"), title='🔒 Cadastro de Senha', border_style='purple', width=60))
-            senha_cd = self.input_senha('Senha: ').strip()
+            console.print(Panel('Sua senha deve conter 8 caracteres', title='🔒 Cadastro de Senha', border_style = 'purple'))
+            senha_cd = self.InputSenha('Senha: ').strip()
             
             # Restrição do tamanho da senha
             if len(senha_cd) != 8:
-                Menu.limpar_terminal()
-                console.print(Panel(Align.center('[bold red]❌ Senha inválida. Deve conter 8 caracteres.[/bold red]', vertical="middle"), border_style='red', width=60))
+                Menu.LimparTerminal()
+                console.print('[bold red]❌ Senha inválida.[/bold red] Deve conter 8 caracteres.')
             # Confirmação da senha
             else:
-                senha_2 = self.input_senha('Confirme a senha: ').strip()
+                senha_2 = self.InputSenha('Confirme a senha: ').strip()
                 if senha_cd == senha_2:
-                    Menu.limpar_terminal()
-                    console.print(Panel(Align.center('[bold green]🔓 Senha cadastrada com sucesso![/bold green]', vertical="middle"), border_style='green', width=60))
+                    Menu.LimparTerminal()
+                    console.print('[bold green]🔓 Senha cadastrada com sucesso![/bold green]') 
                     return senha_cd
                 else:
-                    Menu.limpar_terminal()
-                    console.print(Panel(Align.center('[bold red]❌ As senhas não coincidem.[/bold red]', vertical="middle"), border_style='red', width=60))
+                    Menu.LimparTerminal()
+                    console.print('[bold red]❌ As senhas não coincidem.[/bold red]')
 
-    def cadastro_numero(self):
+    def CadastroNumero(self):
         '''
             Cadastro opcional do número de Whatsapp com validação de 11 dígitos.
         '''
         from menu import Menu
         
 
-        console.print(Panel(Align.center('Deseja cadastrar seu número de Whatsapp?\n[dim]1. Sim     2. Não[/dim]', vertical="middle"), title='📱 Cadastro de Whatsapp', border_style='cyan', width=60))
+        console.print(Panel('Deseja cadastrar seu número de Whatsapp?', title='📱 Cadastro de Whatsapp', border_style='cyan'))
         print("1. Sim\n2. Não")
         opcao_cd_numero = input('Digite: ')
         if opcao_cd_numero == '1':
             while True:
-                console.print(Panel(Align.center('Digite seu Whatsapp com DDD, apenas números.\nExemplo: 81999999999', vertical="middle"), title='📞 Número de Whatsapp', border_style='purple', width=60))
+                console.print('Digite seu Whatsapp com DDD, apenas números. Ex: 81999999999')
                 numero_cd = input('Número: ').strip()
                 # Restricões do tamanho do número. Padrão (81) 912341234
                 if len(numero_cd) == 11 and numero_cd.isdigit(): # isdigit usado para ver se to tem números
-                    Menu.limpar_terminal()
-                    console.print(Panel(Align.center('[bold green]📲 Número cadastrado com sucesso![/bold green]', vertical="middle"), border_style='green', width=60))
+                    Menu.LimparTerminal()
+                    console.print('[bold green]📲 Número cadastrado com sucesso![/bold green]')
                     return numero_cd
                 else:
-                    console.print(Panel(Align.center('[bold red]❌ Número inválido. Deve conter 11 dígitos.[/bold red]', vertical="middle"), border_style='red', width=60))
+                    console.print('[bold red]❌ Número inválido.[/bold red] Deve conter 11 dígitos.')
         elif opcao_cd_numero == '2':
-            Menu.limpar_terminal()
+            Menu.LimparTerminal()
             return "" # Precisa retornar o vazio.
         else:
-            console.print(Panel(Align.center('[bold red]❌ Opção inválida. Digite 1 ou 2.[/bold red]', vertical="middle"), border_style='red', width=60))
-            return self.cadastro_numero()
+            console.print('[bold red]❌ Opção inválida.[/bold red] Digite 1 ou 2.')
+            return self.CadastroNumero()
             
         
-    def login_usuario(self):
+    def LoginUsuario(self):
         '''
             Essa função recebe o email e lê o bancodedados.txt para verificar se o usuário é válido.
             Se o email não estiver no txt repete o input até receber uma entrada válida.
@@ -355,57 +356,57 @@ class Usuario:
                 emails = [linha.strip().split(',')[1] for linha in arquivo if len(linha.strip().split(',')) >= 2]
 
                 if email_log in emails:
-                    console.print(Panel("[bold green]✅ Usuário válido! Redirecionando...[/bold green]", border_style="green", width=60))
+                    console.print(Panel('[bold green]✅ Usuário válido![/bold green]', border_style='green'))
                     time.sleep(1.5)
                     return email_log
                 else:
-                    Menu.limpar_terminal()
-                    console.print(Panel("[bold red]❌ E-mail inválido ou não cadastrado.[/bold red]", border_style="red", width=60))
+                    Menu.LimparTerminal()
+                    console.print(Panel('[bold red]❌ E-mail inválido ou não cadastrado.[/bold red]', border_style='red'))
                     time.sleep(1.5)
         
-    def esqueci_senha(self):
+    def EsqueciSenha(self):
         '''
             Aqui está presente a função que consegue mudar a senha do usuário cadastrado antes do login.
             Isso é possível porque após confirmar o usuário o código manda um código para o email do usuário.
-            Depois chama as funções enviar_email e mudar_senha_esqueci para a confirmação do código e troca de senha
+            Depois chama as funções EnviarEmail e MudarSenhaEsqueci para a confirmação do código e troca de senha
             Se o email não estiver no txt, repete o input até receber uma entrada válida.
             Se o código não estiver correto, repete o input até confirmar o código.
         '''
         from menu import Menu
         
         while True:
-            console.print(Panel(Align.center("Digite seu e-mail para recuperar a senha"), title="🔑 ESQUECI MINHA SENHA", border_style="purple", width=60))
+            console.print(Panel('Digite seu e-mail para recuperar a senha', title='🔑 ESQUECI MINHA SENHA', border_style='purple'))
             email_log = input('E-mail: ').strip()
 
             # Checar se o usuário está presente no arquivo
             with open('bancodedados.txt', 'r') as arquivo:
                 txt = arquivo.read()
             if email_log in txt:
-                console.print(Panel("[bold green]📨 Usuário encontrado. Enviando código...[/bold green]", border_style="green", width=60))
+                console.print(Panel('[bold green]📨 Usuário encontrado. Enviando e-mail com código...[/bold green]', border_style='green'))
                 time.sleep(1.5)
                 codigo =  random.randint(100000,999999) 
                 conteudo = (f"Olá! Seu código de verificação é: {codigo}")
-                self.enviar_email(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
+                self.EnviarEmail(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
                 while True:
-                    Menu.limpar_terminal()
-                    console.print(Panel(Align.center("Digite o código enviado para seu e-mail"), title="📩 CÓDIGO DE VERIFICAÇÃO", border_style="purple", width=60))
+                    Menu.LimparTerminal()
+                    console.print(Panel('Digite o código enviado para seu e-mail', title='📩 CÓDIGO DE VERIFICAÇÃO', border_style='purple'))
                     codigo_input = input('Código: ').strip()
                     if codigo_input == str(codigo):
-                        console.print(Panel("[bold green]✅ Código correto![/bold green] Redefina sua senha.", border_style="green", width=60))
+                        console.print(Panel('[bold green]✅ Código correto![/bold green] Redefina sua senha.', border_style='green'))
                         time.sleep(1)
-                        self.mudar_senha_esqueci(email_log)
+                        self.MudarSenhaEsqueci(email_log)
                         return codigo_input and email_log
                     else:
-                        console.print(Panel("[bold red]❌ Código incorreto. Tente novamente.[/bold red]", border_style="red", width=60))
+                        console.print(Panel('[bold red]❌ Código incorreto. Tente novamente.[/bold red]', border_style='red'))
                         time.sleep(1.5)
                     
             else:
-                Menu.limpar_terminal()
-                console.print(Panel("[bold red]❌ E-mail não encontrado no sistema.[/bold red]", border_style="red", width=60))
+                Menu.LimparTerminal()
+                console.print(Panel('[bold red]❌ E-mail não encontrado no sistema.[/bold red]', border_style='red'))
                 time.sleep(1.5)
 
         
-    def mudar_senha_esqueci(self, usuario):
+    def MudarSenhaEsqueci(self, usuario):
         '''
             Essa função é iniciada após a confirmação do código, então ela recebe como entrada a nova senha
             Ocorre a leitura do bancodedados.txt para separar a senha do usuário e trocá-la pela senha_nova.
@@ -419,10 +420,10 @@ class Usuario:
         from menu import Menu
         
 
-        Menu.limpar_terminal()
-        console.print(Panel(Align.center("Digite sua nova senha (8 caracteres)"), title="🔒 REDEFINIR SENHA", border_style="purple", width=60))
+        Menu.LimparTerminal()
+        console.print(Panel('Digite sua nova senha (8 caracteres)', title='🔒 REDEFINIR SENHA', border_style='purple'))
 
-        senha_nova = self.input_senha('Nova senha: ').strip()
+        senha_nova = self.InputSenha('Nova senha: ').strip()
 
         # Lê todas as linhas do arquivo
         with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
@@ -452,16 +453,16 @@ class Usuario:
             # Só reescreve o arquivo após o loop completo
             with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                 arquivo.writelines(nova_lista)
-            console.print(Panel("[bold green]🔓 Senha redefinida com sucesso![/bold green] Redirecionando para o menu principal...", border_style="green", width=60))
+            console.print(Panel('[bold green]🔓 Senha redefinida com sucesso![/bold green] Redirecionando para o menu principal...', border_style='green'))
             time.sleep(1.5)
-            menu_global.menu_principal(usuario)
+            menu_global.MenuPrincipal(usuario)
 
         else:
-            console.print(Panel("[bold red]❌ Erro ao redefinir a senha. Usuário não encontrado.[/bold red]", border_style="red", width=60))
+            console.print(Panel('[bold red]❌ Erro: e-mail não encontrado para redefinir senha.[/bold red]', border_style='red'))
             time.sleep(1.5)
-            Menu.menu_inicial()
+            Menu.MenuInicial()
 
-    def mudar_nome_config(self, usuario):
+    def MudarNomeConfig(self, usuario):
         '''
             Nessa função é possível mudar o nome do usuário nas configurações.
             Ocorre a leitura do bancodedados.txt para separar o nome do email e da senha para conferir os dados e fazer a mudança.
@@ -469,7 +470,7 @@ class Usuario:
             Depois o nome é substituído pelo nome_novo se tudo ocorrer certo.
 
             Parâmetros:
-                usuario (email_log): o email do login_usuario().
+                usuario (email_log): o email do LoginUsuario().
 
             Se a senha ou o nome atual estiverem incorretos, o programa retorna.
             Se o nome não for trocado, exibe a mensagem de erro e retorna.
@@ -491,18 +492,18 @@ class Usuario:
 
         # confirmação da senha:
         while True: 
-            console.print(Panel('Digite sua senha atual\n[dim]Sua senha tem 8 caracteres[/dim]', title='🔐 Confirmação de Senha', border_style='purple', width=60))
-            senha_cadastrada = self.input_senha('Sua senha: ').strip()
+            console.print(Panel('Digite sua senha atual\n[dim]Sua senha tem 8 caracteres[/dim]', title='🔐 Confirmação de Senha', border_style='purple'))
+            senha_cadastrada = self.InputSenha('Sua senha: ').strip()
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_cadastrada == usuarios.get(usuario):
-                Menu.limpar_terminal()
-                console.print(Panel('[bold green]Senha correta![/bold green]', border_style='green', width=60))
+                Menu.LimparTerminal()
+                console.print(Panel('[bold green]Senha correta![/bold green]', border_style='green'))
                 time.sleep(1.2)
                 break            
             else:
-                Menu.limpar_terminal()
-                console.print(Panel('[bold red]❌ Senha incorreta.[/bold red]', border_style='red', width=60))
+                Menu.LimparTerminal()
+                console.print(Panel('[bold red]❌ Senha incorreta.[/bold red]', border_style='red'))
                 time.sleep(1.2)
 
         nome_usuario = None
@@ -521,7 +522,7 @@ class Usuario:
         if nome_usuario:
             console.print(f'[bold white]Nome atual:[/bold white] {nome_usuario}')
         else:
-            console.print(Panel('[bold red]Erro: usuário não encontrado.[/bold red]', border_style='red', width=60))
+            console.print(Panel('[bold red]Erro: usuário não encontrado.[/bold red]', border_style='red'))
             return
 
 
@@ -552,26 +553,26 @@ class Usuario:
         if nome_trocado:
             with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                 arquivo.writelines(nova_lista_nome)
-            console.print(Panel('[bold green]✅ Nome atualizado com sucesso![/bold green]', border_style='green', width=60))
+            console.print(Panel('[bold green]✅ Nome atualizado com sucesso![/bold green]', border_style='green'))
             time.sleep(1.5)
-            menu_global.menu_principal(usuario)
+            menu_global.MenuPrincipal(usuario)
         else:
-            Menu.limpar_terminal()
-            console.print(Panel('[bold red]❌ Erro: e-mail não encontrado.[/bold red]', border_style='red', width=60))
+            Menu.LimparTerminal()
+            console.print(Panel('[bold red]❌ Erro: e-mail não encontrado.[/bold red]', border_style='red'))
             time.sleep(1.5)
-            menu_global.menu_principal(usuario)
+            menu_global.MenuPrincipal(usuario)
 
         
 
-    def mudar_senha_config(self, usuario):
+    def MudarSenhaConfig(self, usuario):
         '''
-            Muito parecida com mudar_nome_config, essa função é possível mudar a senha do usuário nas configurações.
+            Muito parecida com MudarNomeConfig, essa função é possível mudar a senha do usuário nas configurações.
             Ocorre a leitura do bancodedados.txt para separar a senha do email e do nome para conferir os dados e fazer a mudança.
             Antes de mudar, a senha é pedida para confirmar a ação.
             Depois a senha é substituída pelo senha_nova se tudo ocorrer certo.
 
             Parâmetros:
-                usuario (email_log): o email do login_usuario().
+                usuario (email_log): o email do LoginUsuario().
 
             Se a senha ou o nome atual estiverem incorretos, o programa retorna.
             Se a senha não for trocada, exibe a mensagem de erro e retorna.
@@ -584,32 +585,28 @@ class Usuario:
             usuarios = {}
             for line in arquivo:
                 partes = line.strip().split(',') 
-                if len(partes) >= 3:   # Separa email da senha
-                    email = partes[1].strip().lower()
+                if len(partes) == 3:   # Separa email da senha
+                    email = partes[1].strip()
                     senha = partes[2].strip()
                     usuarios[email] = senha                    
-        usuario = usuario.lower() 
-        if usuario not in usuarios:
-            console.print(Panel("[bold red]❌ Erro: e-mail não encontrado no sistema.[/bold red]", border_style="red", width=60))
-            time.sleep(1.5)
-            return       
+                
         # confirmação da senha:
         while True: 
-            Menu.limpar_terminal()
-            console.print(Panel('Digite sua senha atual\n[dim]A senha deve conter 8 caracteres[/dim]', title='🔐 CONFIRMAÇÃO DE SENHA', border_style='purple', width=60))
-            senha_cadastrada = self.input_senha('Sua senha: ').strip() # Chamar criptografia
+            Menu.LimparTerminal()
+            console.print(Panel('Digite sua senha atual\n[dim]A senha deve conter 8 caracteres[/dim]', title='🔐 CONFIRMAÇÃO DE SENHA', border_style='purple'))
+            senha_cadastrada = self.InputSenha('[bold white]Sua senha:[/bold white] ').strip() # Chamar criptografia
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_cadastrada == usuarios[usuario]:
-                Menu.limpar_terminal()
-                console.print(Panel('[bold green]Senha correta![/bold green]', border_style='green', width=60))
+                Menu.LimparTerminal()
+                console.print('[bold green]Senha correta![/bold green]', border_style='green')
                 time.sleep(1.2)
                 break            
             else:
-                Menu.limpar_terminal()
-                console.print(Panel('[bold red]❌ Senha incorreta.[/bold red]', border_style='red', width=60))
+                Menu.LimparTerminal()
+                console.print('[bold red]❌ Senha incorreta.[/bold red]', border_style='red')
 
-        senha_nova = self.input_senha('Nova senha: ').strip()
+        senha_nova = self.InputSenha('[bold white]Nova senha:[/bold white]').strip()
 
         # Lê todas as linhas do arquivo
         with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
@@ -623,7 +620,7 @@ class Usuario:
 
         for linha in linhas:
             partes = linha.strip().split(',')
-            if len(partes) >= 3:
+            if len(partes) == 3:
                 nome = partes[0].strip()
                 email = partes[1].strip()
                 senha = partes[2].strip()
@@ -640,30 +637,30 @@ class Usuario:
             # Só reescreve o arquivo após o loop completo
             with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                 arquivo.writelines(nova_lista_senha)
-            console.print(Panel('[bold green]✅ Senha atualizada com sucesso![/bold green]', border_style='green', width=60))
+            console.print(Panel('[bold green]✅ Senha atualizada com sucesso![/bold green]', border_style='green'))
             time.sleep(1.5)
-            menu_global.menu_principal(usuario)
+            menu_global.MenuPrincipal(usuario)
         else:
-            console.print(Panel('[bold red]❌ Erro: e-mail não encontrado[/bold red]',border_style='red', width=60))
+            console.print('[bold red]❌ Erro: e-mail não encontrado[/bold red]',border_style='red')
 
-    def excluir_conta(self, usuario):
+    def ExcluirConta(self, usuario):
         '''
             Aqui é a parte que se pode deletar a conta do usuário depois da confirmação digitando 1
             Após ler o bancodedados.txt a linha que contem a conta do usuário atual é apagada, excluindo assim o cadastro da pessoa.
-            Se digitar 2, volta para o menu_config().
+            Se digitar 2, volta para o MenuConfig().
             Se opção inválida, continua até opção válida.
             
             Parâmetros:
-                usuario (email_log): o email do login_usuario().
+                usuario (email_log): o email do LoginUsuario().
 
-            Se não for possível excluir a conta, exibir mensagem de erro e ir para menu_config()
+            Se não for possível excluir a conta, exibir mensagem de erro e ir para MenuConfig()
 
         '''
         from sistema import menu_global
         from menu import Menu
-        
-        console.print(Panel(Align.center("Essa ação irá excluir sua conta permanentemente!\n[bold white]Você realmente deseja excluir sua conta?[/bold white]\n[bold white]1 - Sim    2 - Não, voltar[/bold white]"), title="❌ EXCLUIR CONTA", border_style="red", width=60))
-       
+        console.print(Panel('[bold red]⚠️ Atenção![/bold red]\nEssa ação irá excluir sua conta permanentemente!', title='❌ Excluir Conta', border_style='red'))
+        console.print('[bold white]Você realmente deseja excluir sua conta?[/bold white]')
+        console.print('[bold white]1 - Sim\n2 - Não, voltar[/bold white]')
         resposta_ec = input('Digite a opção desejada: ')
         conta_excluida = False
         while True:
@@ -676,45 +673,45 @@ class Usuario:
                 
                 nova_lista_conta = [linha for linha in linhas if linha.strip().split(',')[1] != email_excluir]
                 if len(nova_lista_conta) == len(linhas):
-                    console.print(Panel("[bold red]❌ Usuário não encontrado.[/bold red]", border_style="red", width=60))
+                    console.print(Panel('[bold red]❌ Usuário não encontrado.[/bold red]', border_style='red'))
                     time.sleep(1.2)
                 else:
                     conta_excluida = True
                     with open('bancodedados.txt', 'w', encoding='utf-8') as arquivo:
                         arquivo.writelines(nova_lista_conta)
-                    console.print(Panel("[bold red]🧹 Excluindo conta...[/bold red]", border_style="red", width=60))
+                    console.print('\n[bold red]Excluindo conta...[/bold red]')
                     for i in range(3, 0, -1):
-                        console.print(Align.center(f"[dim]Limpando em: {i}...[/dim]"))
+                        console.print(f'[dim]Limpando em: {i}...[/dim]')
                         time.sleep(1)
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                 
                 if conta_excluida:
-                    console.print(Panel('[bold green]✅ Conta excluída com sucesso![/bold green]', border_style='green', width=60))
+                    console.print(Panel('[bold green]✅ Conta excluída com sucesso![/bold green]', border_style='green'))
                     time.sleep(1.5)
                     
                 else:
-                    console.print(Panel('[bold red]❌ Erro ao encontrar o e-mail. Tente novamente.[/bold red]', border_style='red', width=60))
+                    console.print(Panel('[bold red]❌ Erro ao encontrar o e-mail. Tente novamente.[/bold red]', border_style='red'))
                     time.sleep(1.5)
-                    menu_global.menu_config(usuario)
+                    menu_global.MenuConfig(usuario)
                 break
 
             elif resposta_ec == '2':
-                Menu.limpar_terminal()
-                menu_global.menu_config(usuario)
+                Menu.LimparTerminal()
+                menu_global.MenuConfig(usuario)
                 break
             else:
-                Menu.limpar_terminal()
-                console.print(Panel('[bold red]❌ Opção inválida. Digite 1 ou 2.[/bold red]', border_style='red', width=60)) 
+                Menu.LimparTerminal()
+                console.print(Panel('[bold red]❌ Opção inválida. Digite 1 ou 2.[/bold red]', border_style='red')) 
                 resposta_ec = input('Digite novamente: ').strip()  
 
 
-    def feedback(self, usuario):
+    def Feedback(self, usuario):
         '''
             Aqui está a conexão entre o usuário e os desenvolvedores, uma opção de enviar email para os criadores do programa.
             Essa função envia a mensagem (input) para Breno, João e o próprio usuário para mostrar e possibilitar a conversa ao cliente
 
             Parâmetros:
-                usuario (email_log): o email do login_usuario().
+                usuario (email_log): o email do LoginUsuario().
         
             Também tem a opção de editar ou cancelar o envio da mensagem
             Se não for possível enviar email retornar.
@@ -753,10 +750,10 @@ class Usuario:
                 print('Feedback atual: ', feed_mensagem) # Continua o texto para edição
                 continue
             elif editar == '2': # Criar e enviar e-mail
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print('[bold blue]Enviando e-mail...[/bold blue]')
                 try:
-                    self.enviar_email(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
+                    self.EnviarEmail(email_suporte1, email_suporte2, email_copia_cliente, assunto, feed_mensagem)
 
                     msg_comprovante = Panel(
                         Align.center(
@@ -772,17 +769,17 @@ class Usuario:
                     input('Pressione Enter para voltar...')
                 except Exception:
                     print('Erro ao enviar feedback')
-                Menu.limpar_terminal()
-                return menu_global.menu_config(usuario)
+                Menu.LimparTerminal()
+                return menu_global.MenuConfig(usuario)
             
 
             elif editar == '3':
-                Menu.limpar_terminal()
-                return menu_global.menu_config(usuario) 
+                Menu.LimparTerminal()
+                return menu_global.MenuConfig(usuario) 
             else:
                 print('Opção Inválida!')   
 
-    def registrar_compra(self, login_usuario, nome_produto, valor):
+    def RegistrarCompra(self, LoginUsuario, nome_produto, valor):
         '''
         Salva a compra no extrato.txt no formato:
         email: item1 | item2 | item3 ...
@@ -803,7 +800,7 @@ class Usuario:
         usuario_encontrado = False
 
         for linha in linhas:
-            if linha.startswith(f'{login_usuario}:'):
+            if linha.startswith(f'{LoginUsuario}:'):
                 usuario_encontrado = True
                 linha = linha.strip()
                 if not linha.endswith('|'):
@@ -814,12 +811,12 @@ class Usuario:
                 nova_linha.append(linha)
 
         if not usuario_encontrado:
-            nova_linha.append(f'{login_usuario}: {nova_entrada} |\n')
+            nova_linha.append(f'{LoginUsuario}: {nova_entrada} |\n')
 
         with open('extrato.txt', 'w', encoding='utf-8') as f:
             f.writelines(nova_linha)
     
-    def mostrar_extrato(self, usuario):
+    def MostrarExtrato(self, usuario):
         from sistema import menu_global
         from menu import Menu
         
@@ -851,6 +848,6 @@ class Usuario:
             console.print('\n[bold yellow]X[/bold yellow] - Voltar')
             opcao = input('Digite: ').strip().upper()
             if opcao == 'X':
-                Menu.limpar_terminal()
-                menu_global.menu_config(usuario)
+                Menu.LimparTerminal()
+                menu_global.MenuConfig(usuario)
                 break
