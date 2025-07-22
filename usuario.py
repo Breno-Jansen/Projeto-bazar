@@ -743,10 +743,11 @@ class Usuario:
         assunto = 'Mensagem enviada dos Feedbacks Bazar Brejó'
         while True:
             # Escrever mensagem
-            console.print(Panel('Envie aqui seu feedback sobre o sistema 📨', title = '📬 Envio de Feedback', border_style = 'purple', width=60))
+            console.print(Panel('Envie aqui seu feedback sobre o sistema 📨', title = '📬 ENVIO DE FEEDBACK', border_style = 'purple', width=60))
             feed_mensagem = Prompt.ask('Escreva seu feedback: ').strip()
             
-            console.print(Panel(f'[yellow]{feed_mensagem}[/yellow]', width=60))
+            Menu.LimparTerminal()
+            console.print(Panel(f'[yellow]{feed_mensagem}[/yellow]', title='📬 FEEDBACK ATUAL', width=60))
             console.print('[bold]1 -[/bold] Editar Feedback\n[bold]2 -[/bold] Enviar Feedback\n[bold]3 -[/bold] Cancelar')
             editar = input('Digite a opção: ').strip()
             if editar == '1': # Editar e-mail
