@@ -33,7 +33,7 @@ class Item:
             arquivo.write(f'.{nova_numeracao}. {self.nome} | R${self.preco} | Estado (1 a 5): {self.estado} | {self.descricao} | \n\n')
         console.print(Panel(f'✅ Item "{self.nome}" adicionado com sucesso!', border_style="green", width=60))
         time.sleep(1.5)
-        menu_global.menu_principal(self.usuario)
+        menu_global.MenuPrincipal(self.usuario)
 
 
 
@@ -69,7 +69,7 @@ class Item:
         """
         from menu import Menu
 
-        Menu.limpar_terminal()
+        Menu.LimparTerminal()
         console.print(Panel("❌ Arquivo de itens não encontrado.", border_style="red", width=60))
         nome = input('Nome do item: ').strip()
         descricao = input('Descrição do item: ').strip()
@@ -124,7 +124,7 @@ class Item:
         if not itens:
             console.print(Panel("❌ Nenhum item disponível.", border_style="red", width=60))
             time.sleep(1.5)
-            return menu_global.menu_principal(usuario)
+            return menu_global.MenuPrincipal(usuario)
         
         console.print(Panel("[bold]Itens Disponíveis:[/bold]", title="🛒 COMPRAR ITEM", border_style="purple", width=60))
 
@@ -163,14 +163,14 @@ class Item:
                             try:
                                 Item.RemoverItemDoArquivo(item_selecionado.nome)
                             except Exception as e:
-                              console.print(Panel(f"Erro ao remover item: {e}", border_style="red", width=60))  
+                                console.print(Panel(f"Erro ao remover item: {e}", border_style="red", width=60))  
                             return menu_global.MenuPrincipal(usuario)    
                         elif confirmar == '2':
-                            Menu.limpar_terminal()
+                            Menu.LimparTerminal()
                             console.print(Panel("Compra cancelada.", border_style="yellow", width=60))
                             break
                         else:
-                            Menu.limpar_terminal()
+                            Menu.LimparTerminal()
                             console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
                     break
                 elif opcao == '2':
@@ -181,7 +181,7 @@ class Item:
                     menu_global.MenuPrincipal(usuario)
                     break
                 else:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
             break
 

@@ -199,7 +199,7 @@ class Usuario:
                     usuarios[email] = senha
 
         if usuario not in usuarios: # Se usuário não tiver no banco de dados
-            Menu.limpar_terminal()
+            Menu.LimparTerminal()
             console.print(Panel('[bold red]❌ Usuário não encontrado.[/bold red]', border_style='red', width=60))
             time.sleep(1.5)
             return                    
@@ -207,7 +207,7 @@ class Usuario:
         # Login da senha:
         while True: 
             console.print(Panel('Digite sua senha (8 caracteres)', title='🔑 LOGIN DE SENHA', border_style='purple', width=60))
-            senha_log = self.input_senha('Senha: ').strip() # Chamar criptografia
+            senha_log = self.InputSenha('Senha: ').strip() # Chamar criptografia
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_log == usuarios[usuario]:
@@ -224,7 +224,7 @@ class Usuario:
                 return senha_log and usuario
                 
             else:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel('[bold red]❌ Senha incorreta. Tente novamente.[/bold red]', border_style='red', width=60))
                 time.sleep(1.5)
                 
@@ -275,13 +275,13 @@ class Usuario:
                 with open('bancodedados.txt', 'r') as arquivo:
                     usuarios = arquivo.read()
                 if email_cd in usuarios:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     console.print(Panel(Align.center('[bold red]❌ E-mail já cadastrado. Insira outro e-mail![/bold red]', vertical="middle"), border_style='red', width=60))
                 else:
                     Menu.LimparTerminal()
                     return email_cd
             else:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel(Align.center('[bold red]❌ E-mail inválido.[/bold red]\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', vertical="middle"), border_style='red', width=60))
 
     def CadastroSenha(self):
@@ -296,21 +296,21 @@ class Usuario:
 
         while True:
             console.print(Panel(Align.center('Sua senha deve conter 8 caracteres', vertical="middle"), title='🔒 Cadastro de Senha', border_style='purple', width=60))
-            senha_cd = self.input_senha('Senha: ').strip()
+            senha_cd = self.InputSenha('Senha: ').strip()
             
             # Restrição do tamanho da senha
             if len(senha_cd) != 8:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel(Align.center('[bold red]❌ Senha inválida. Deve conter 8 caracteres.[/bold red]', vertical="middle"), border_style='red', width=60))
             # Confirmação da senha
             else:
                 senha_2 = self.InputSenha('Confirme a senha: ').strip()
                 if senha_cd == senha_2:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     console.print(Panel(Align.center('[bold green]🔓 Senha cadastrada com sucesso![/bold green]', vertical="middle"), border_style='green', width=60))
                     return senha_cd
                 else:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     console.print(Panel(Align.center('[bold red]❌ As senhas não coincidem.[/bold red]', vertical="middle"), border_style='red', width=60))
 
     def CadastroNumero(self):
@@ -329,7 +329,7 @@ class Usuario:
                 numero_cd = input('Número: ').strip()
                 # Restricões do tamanho do número. Padrão (81) 912341234
                 if len(numero_cd) == 11 and numero_cd.isdigit(): # isdigit usado para ver se to tem números
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     console.print(Panel(Align.center('[bold green]📲 Número cadastrado com sucesso![/bold green]', vertical="middle"), border_style='green', width=60))
                     return numero_cd
                 else:
@@ -361,7 +361,7 @@ class Usuario:
                     time.sleep(1.5)
                     return email_log
                 else:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     console.print(Panel("[bold red]❌ E-mail inválido ou não cadastrado.[/bold red]", border_style="red", width=60))
                     time.sleep(1.5)
         
@@ -389,7 +389,7 @@ class Usuario:
                 conteudo = (f"Olá! Seu código de verificação é: {codigo}")
                 self.EnviarEmail(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
                 while True:
-                    Menu.limpar_terminal()
+                    Menu.LimparTerminal()
                     console.print(Panel(Align.center("Digite o código enviado para seu e-mail"), title="📩 CÓDIGO DE VERIFICAÇÃO", border_style="purple", width=60))
                     codigo_input = input('Código: ').strip()
                     if codigo_input == str(codigo):
@@ -402,7 +402,7 @@ class Usuario:
                         time.sleep(1.5)
                     
             else:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel("[bold red]❌ E-mail não encontrado no sistema.[/bold red]", border_style="red", width=60))
                 time.sleep(1.5)
 
@@ -420,7 +420,7 @@ class Usuario:
         from sistema import menu_global
         from menu import Menu
         
-        Menu.limpar_terminal()
+        Menu.LimparTerminal()
         console.print(Panel(Align.center("Digite sua nova senha (8 caracteres)"), title="🔒 REDEFINIR SENHA", border_style="purple", width=60))
 
         senha_nova = self.InputSenha('Nova senha: ').strip()
@@ -493,16 +493,16 @@ class Usuario:
         # confirmação da senha:
         while True: 
             console.print(Panel('Digite sua senha atual\n[dim]Sua senha tem 8 caracteres[/dim]', title='🔐 Confirmação de Senha', border_style='purple', width=60))
-            senha_cadastrada = self.input_senha('Sua senha: ').strip()
+            senha_cadastrada = self.InputSenha('Sua senha: ').strip()
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_cadastrada == usuarios.get(usuario):
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel('[bold green]Senha correta![/bold green]', border_style='green', width=60))
                 time.sleep(1.2)
                 break            
             else:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel('[bold red]❌ Senha incorreta.[/bold red]', border_style='red', width=60))
                 time.sleep(1.2)
 
@@ -557,7 +557,7 @@ class Usuario:
             time.sleep(1.5)
             menu_global.MenuPrincipal(usuario)
         else:
-            Menu.limpar_terminal()
+            Menu.LimparTerminal()
             console.print(Panel('[bold red]❌ Erro: e-mail não encontrado.[/bold red]', border_style='red', width=60))
             time.sleep(1.5)
             menu_global.MenuPrincipal(usuario)
@@ -596,21 +596,21 @@ class Usuario:
             return       
         # confirmação da senha:
         while True: 
-            Menu.limpar_terminal()
+            Menu.LimparTerminal()
             console.print(Panel('Digite sua senha atual\n[dim]A senha deve conter 8 caracteres[/dim]', title='🔐 CONFIRMAÇÃO DE SENHA', border_style='purple', width=60))
-            senha_cadastrada = self.input_senha('Sua senha: ').strip() # Chamar criptografia
+            senha_cadastrada = self.InputSenha('Sua senha: ').strip() # Chamar criptografia
 
             # Se a senha for a mesma da linha do usuário no banco de dados
             if senha_cadastrada == usuarios[usuario]:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel('[bold green]Senha correta![/bold green]', border_style='green', width=60))
                 time.sleep(1.2)
                 break            
             else:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel('[bold red]❌ Senha incorreta.[/bold red]', border_style='red', width=60))
 
-        senha_nova = self.input_senha('Nova senha: ').strip()
+        senha_nova = self.InputSenha('Nova senha: ').strip()
 
         # Lê todas as linhas do arquivo
         with open('bancodedados.txt', 'r', encoding='utf-8') as arquivo:
@@ -704,7 +704,7 @@ class Usuario:
                 menu_global.MenuConfig(usuario)
                 break
             else:
-                Menu.limpar_terminal()
+                Menu.LimparTerminal()
                 console.print(Panel('[bold red]❌ Opção inválida. Digite 1 ou 2.[/bold red]', border_style='red', width=60)) 
                 resposta_ec = input('Digite novamente: ').strip()  
 
@@ -743,10 +743,10 @@ class Usuario:
         assunto = 'Mensagem enviada dos Feedbacks Bazar Brejó'
         while True:
             # Escrever mensagem
-            console.print(Panel('Envie aqui seu feedback sobre o sistema 📨', title = '📬 Envio de Feedback', border_style = 'purple'))
+            console.print(Panel('Envie aqui seu feedback sobre o sistema 📨', title = '📬 Envio de Feedback', border_style = 'purple', width=60))
             feed_mensagem = Prompt.ask('Escreva seu feedback: ').strip()
             
-            console.print(Panel(f'[yellow]{feed_mensagem}[/yellow]'))
+            console.print(Panel(f'[yellow]{feed_mensagem}[/yellow]', width=60))
             console.print('[bold]1 -[/bold] Editar Feedback\n[bold]2 -[/bold] Enviar Feedback\n[bold]3 -[/bold] Cancelar')
             editar = input('Digite a opção: ').strip()
             if editar == '1': # Editar e-mail
@@ -846,7 +846,7 @@ class Usuario:
             panel = Panel(conteudo, title=f'Extrato do usuário: {usuario}', border_style='green')
             console.print(panel)
         else:
-            console.print(f'[bold red]Nenhum item registrado para {usuario}.[/bold red]')
+            console.print(f'[bold red]Nenhum item registrado para {usuario}.[/bold red]', border_style = 'red', width=60)
 
         while True:
             console.print('\n[bold yellow]X[/bold yellow] - Voltar')
