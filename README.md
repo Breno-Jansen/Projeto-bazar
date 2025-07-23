@@ -15,7 +15,7 @@ Foram utilizados imports do python:
 - **import sys** 
 - **import random** 
 - **import smtplib**
--import rich**  
+- **import rich**  
 - **etc.**
 ## 🚀 Começando
 Como funcionalidades no sistema tem:
