@@ -205,7 +205,7 @@ class Item:
                             # Registra no extrato
                             try:
                                 preco_float = float(item_selecionado.preco.replace(',','.'))
-                                usuario_obj.RegistrarCompra(item_selecionado.nome, preco_float)
+                                usuario_obj.RegistrarCompra(usuario, item_selecionado.nome, preco_float)
                             except Exception as e:
                                 console.print(Panel(f"Erro ao registrar no extrato: {e}", border_style="red", width=60))
                             # Remove do arquivo listadeitens.txt
@@ -244,7 +244,7 @@ class Item:
         from usuario import Usuario
 
         console.print(Panel("Deseja negociar com o vendedor?", title="📨 NEGOCIAR", border_style="purple", width=60))
-        print('1 - Escrever email\n2 - Ver contato\n3 - Voltar')
+        print('1 - Escrever email\n2 - Voltar')
         assunto = 'Um cliente do Bazar Brejó quer negociar com você!'
 
         usuario_obj = Usuario()
@@ -262,7 +262,7 @@ class Item:
                     elif editar == '2':
                         Menu.LimparTerminal()
                         try:
-                            usuario_obj.EnviarEmail(destinatario1=item.usuario, destinatario2=None, destinatario3=None, assunto=assunto, conteudo=mensagem)
+                            usuario_obj.EnviarEmail(destinatario1=item.usuario, destinatario2=usuario, destinatario3=None, assunto=assunto, conteudo=mensagem)
                             console.print(Panel("✅ Mensagem enviada! Uma cópia foi enviada ao seu e-mail.", border_style="green", width=60))
                         except Exception:
                             console.print(Panel("❌ Erro ao enviar mensagem.", border_style="red", width=60))
@@ -273,12 +273,7 @@ class Item:
                     else:
                         console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
             elif opcao == '2':
-                Menu.limpar_terminal()
-                console.print(Panel("📱 Número de telefone do vendedor: [em desenvolvimento]", border_style="yellow", width=60))
-                if input('Digite X para voltar: ').strip().upper() == 'X':
-                    return menu_global.MenuPrincipal(usuario)
-            elif opcao == '3':
-                Menu.LimparTerminal()
+                Menu().LimparTerminal()
                 return menu_global.MenuPrincipal(usuario)
             else:
                 console.print(Panel("❌ Opção inválida.", border_style="red", width=60))

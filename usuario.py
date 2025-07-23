@@ -150,11 +150,10 @@ class Usuario:
         email_cd = self.CadastroUsuario()
         # Cadastro da senha
         senha_cd = self.CadastroSenha()
-        # Cadastro do Whatsapp
-        numero_cd = self.CadastroNumero()
+
         # Escrever todos os cadastros no bancodedados.txt
         with open('bancodedados.txt', 'a', encoding = 'utf-8') as arquivo:
-            arquivo.write(f'{nome_cd},{email_cd},{senha_cd},{numero_cd}\n')
+            arquivo.write(f'{nome_cd},{email_cd},{senha_cd}\n')
         # Ir para o login após cadastro
         Menu.LimparTerminal()
         console.print(Panel(
@@ -352,36 +351,6 @@ class Usuario:
                     Menu.LimparTerminal()
                     console.print(Panel(Align.center('[bold red]❌ As senhas não coincidem.[/bold red]', vertical="middle"), border_style='red', width=60))
 
-    def CadastroNumero(self):
-        '''
-            Cadastro opcional do número de Whatsapp com validação de 11 dígitos.
-        '''
-        from menu import Menu
-        
-
-        console.print(Panel(Align.center('Deseja cadastrar seu número de Whatsapp?\n[dim]1. Sim     2. Não[/dim]', vertical="middle"), title='📱 Cadastro de Whatsapp', border_style='cyan', width=60))
-        print("1. Sim\n2. Não")
-        opcao_cd_numero = input('Digite: ')
-        if opcao_cd_numero == '1':
-            while True:
-                Menu.LimparTerminal()
-                console.print(Panel(Align.center('Digite seu Whatsapp com DDD, apenas números.\nExemplo: 81999999999', vertical="middle"), title='📞 Número de Whatsapp', border_style='purple', width=60))
-                numero_cd = input('Número: ').strip()
-                # Restricões do tamanho do número. Padrão (81) 912341234
-                if len(numero_cd) == 11 and numero_cd.isdigit(): # isdigit usado para ver se to tem números
-                    Menu.LimparTerminal()
-                    console.print(Panel(Align.center('[bold green]📲 Número cadastrado com sucesso![/bold green]', vertical="middle"), border_style='green', width=60))
-                    return numero_cd
-                else:
-                    console.print(Panel(Align.center('[bold red]❌ Número inválido. Deve conter 11 dígitos.[/bold red]', vertical="middle"), border_style='red', width=60))
-        elif opcao_cd_numero == '2':
-            Menu.LimparTerminal()
-            return "" # Precisa retornar o vazio.
-        else:
-            console.print(Panel(Align.center('[bold red]❌ Opção inválida. Digite 1 ou 2.[/bold red]', vertical="middle"), border_style='red', width=60))
-            return self.cadastro_numero()
-            
-        
     def LoginUsuario(self):
         '''
             Essa função recebe o email e lê o bancodedados.txt para verificar se o usuário é válido.

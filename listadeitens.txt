@@ -1,6 +1,8 @@
- | kaka | 
 
-.3. kaka | R$20,00 | Estado (1 a 5): Bom | kaka | Vendedor: jgsa1502@gmail.com
 
-.4. kaka | R$20,00 | Estado (1 a 5): Bom | kaka | Vendedor: jgsa1502@gmail.com
+.1. Lapis de Heitozera | R$1,00 | Estado (1 a 5): Bom | Lapis verde | Vendedor: jgsa1502@gmail.com
+
+.2. Camisa do milan 2008 | R$120,00 | Estado (1 a 5): Excelente | camisa do kaka | Vendedor: jgsa1502@gmail.com
+
+.3. Fone de ouvido | R$45,60 | Estado (1 a 5): Bom | Fone de ouvido sem fio e preto | Vendedor: jgsa1502@gmail.com
 
