@@ -262,7 +262,7 @@ class Item:
                     elif editar == '2':
                         Menu.LimparTerminal()
                         try:
-                            usuario_obj.EnviarEmail(destinatario1=item.usuario.email, destinatario2=None, destinatario3=None, assunto=assunto, conteudo=mensagem)
+                            usuario_obj.EnviarEmail(destinatario1=item.usuario, destinatario2=None, destinatario3=None, assunto=assunto, conteudo=mensagem)
                             console.print(Panel("✅ Mensagem enviada! Uma cópia foi enviada ao seu e-mail.", border_style="green", width=60))
                         except Exception:
                             console.print(Panel("❌ Erro ao enviar mensagem.", border_style="red", width=60))
