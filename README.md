@@ -9,12 +9,13 @@ O Bazar Brejó busca incentivar práticas de consumo consciente e sustentável, 
 
 ## ⚙️ Tecnologias utilizadas
 ### **Python** 
-Por enquanto so foram usados imports nativos do python: 
+Foram utilizados imports do python: 
 - **import os** 
 - **import time** 
 - **import sys** 
 - **import random** 
-- **import smtplib** 
+- **import smtplib**
+-import rich**  
 - **etc.**
 ## 🚀 Começando
 Como funcionalidades no sistema tem:
@@ -44,6 +45,20 @@ Como funcionalidades no sistema tem:
 - Escrever Feedback;
 - Editar;
 - Enviar
+
+## 📦 Instalação das Dependências
+
+Para executar o Bazar Brejó corretamente, é necessário instalar as dependências do projeto, incluindo a biblioteca [**rich**](https://pypi.org/project/rich/), que é usada para estilizar a interface no terminal.
+
+### Passo a passo para instalar o `rich`:
+
+1. **Certifique-se que o Python está instalado**
+
+   Verifique se o Python está instalado no seu sistema e a versão está atualizada (recomenda-se Python 3.7 ou superior):
+
+   ```bash
+   python --version
+
 ## 📄 Licença
 
 Sem licença definida.
