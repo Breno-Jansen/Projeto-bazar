@@ -24,14 +24,14 @@ class Item:
                 linhas = txt.readlines()
             numeracoes = [
                 int(linha.split('.')[1])
-                for linha in linhas if '|' in linha and len(linha.split('|')) == 5
+                for linha in linhas if '|' in linha and len(linha.split('|')) >= 5
             ]
             nova_numeracao = str(max(numeracoes) + 1) if numeracoes else '1'
         except FileNotFoundError:
             nova_numeracao = '1'
 
         with open('listadeitens.txt', 'a', encoding='utf-8') as arquivo:
-            arquivo.write(f'.{nova_numeracao}. {self.nome} | R${self.preco} | Estado (1 a 5): {self.estado} | {self.descricao} | \n\n')
+            arquivo.write(f'.{nova_numeracao}. {self.nome} | R${self.preco} | Estado (1 a 5): {self.estado} | {self.descricao} | Vendedor: {self.usuario}\n\n')
         console.print(Panel(f'✅ Item "{self.nome}" adicionado com sucesso!', border_style="green", width=60))
         time.sleep(1.5)
         menu_global.MenuPrincipal(self.usuario)
@@ -55,7 +55,12 @@ class Item:
                     preco = partes[1].replace('R$', '').strip()
                     estado = partes[2].replace('Estado (1 a 5):', '').strip()
                     descricao = partes[3].strip()
-                    item = Item(nome_e_numero, preco, estado, descricao, usuario=None)  # Sem dono definido
+                    vendedor_info = partes[4].strip()
+                    email_vendedor = ""
+                    if vendedor_info.startswith('Vendedor:'):
+                        email_vendedor = vendedor_info.replace('Vendedor:', '').strip()
+
+                    item = Item(nome_e_numero, preco, estado, descricao, usuario= email_vendedor)  # Sem dono definido
                     itens.append(item)
         except FileNotFoundError:
            console.print(Panel("❌ Arquivo de itens não encontrado.", border_style="red", width=60))
@@ -93,17 +98,27 @@ class Item:
                 '5 - Excelente'
             )
             console.print(Panel(tabela, title = '[bold white]GUIA DO ESTADO DE CONSERVAÇÃO[/bold white]', border_style = 'purple', width = 60))
-            estado = input('Estado do item (1 a 5): ').strip()
+            estado_input = input('Estado do item (1 a 5): ').strip()
             
-            if estado.lower() == 'cancelar':
+            if estado_input.lower() == 'cancelar':
                 console.print(Align.center(Panel('❌ [red]Operação cancelada.[/red]', width=40, border_style='red')))
                 time.sleep(1.5)
                 return Menu().MenuPrincipal(usuario)
-            
-            if estado.isdigit() and 1 <= int(estado) <= 5:
+        
+            # Converter 
+            if estado_input in ['1', '2', '3', '4', '5']:
+                estados_dict = {
+                    '1': 'Péssimo',
+                    '2': 'Ruim',
+                    '3': 'Regular',
+                    '4': 'Bom',
+                    '5': 'Excelente'
+                }
+                estado = estados_dict[estado_input]
                 break
-            console.print(Panel("❌ Estado inválido. Digite um número entre 1 e 5.", border_style="red", width=60))
-
+            else:
+                console.print(Panel("❌ Estado inválido. Digite um número entre 1 e 5.", border_style="red", width=60))
+                input('Pressione ENTER para tentar novamente')
         while True:
             console.print(Panel('💰 [bold yellow]Modelo de preço: R$ 20,00[/bold yellow]', width=50, border_style='purple'))
             try:
@@ -164,7 +179,7 @@ class Item:
 
         for index, item in enumerate(itens, start=1):
             console.print(f" .{index}. {item.nome.ljust(35)} | R${item.preco}")
-        print(' .X. Voltar para o menu principal')
+        console.print(' .[bold yellow]X[/bold yellow]. Voltar para o menu principal')
 
         while True:
             escolha = input('Escolha um produto (número) ou X para voltar: ').strip().lower()
@@ -222,14 +237,17 @@ class Item:
     @staticmethod
     def Negociar(usuario, item):
         """
-            Permite negociar com o vendedor (em desenvolvimento).
+            Permite negociar com o vendedor.
         """
         from sistema import menu_global
         from menu import Menu
+        from usuario import Usuario
 
         console.print(Panel("Deseja negociar com o vendedor?", title="📨 NEGOCIAR", border_style="purple", width=60))
         print('1 - Escrever email\n2 - Ver contato\n3 - Voltar')
         assunto = 'Um cliente do Bazar Brejó quer negociar com você!'
+
+        usuario_obj = Usuario()
 
         while True:
             opcao = input('Escolha uma opção: ').strip()
@@ -244,7 +262,7 @@ class Item:
                     elif editar == '2':
                         Menu.LimparTerminal()
                         try:
-                            item.usuario.enviar_email(usuario, 'jgsa1502@gmail.com', None, assunto, mensagem)
+                            usuario_obj.EnviarEmail(destinatario1=item.usuario.email, destinatario2=None, destinatario3=None, assunto=assunto, conteudo=mensagem)
                             console.print(Panel("✅ Mensagem enviada! Uma cópia foi enviada ao seu e-mail.", border_style="green", width=60))
                         except Exception:
                             console.print(Panel("❌ Erro ao enviar mensagem.", border_style="red", width=60))

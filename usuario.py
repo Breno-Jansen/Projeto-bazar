@@ -424,7 +424,7 @@ class Usuario:
             with open('bancodedados.txt', 'r') as arquivo:
                 txt = arquivo.read()
             if email_log in txt:
-                Menu.LimparTerminal()
+                Menu.LimparTerminal
                 console.print(Panel("[bold green]📨 Usuário encontrado. Enviando código...[/bold green]", border_style="green", width=60))
                 time.sleep(1.5)
                 codigo =  random.randint(100000,999999) 
@@ -902,7 +902,7 @@ class Usuario:
             panel = Panel(conteudo, title=f'Extrato do usuário: {usuario}', border_style='green', width=60)
             console.print(panel)
         else:
-            console.print(f'[bold red]Nenhum item registrado para {usuario}.[/bold red]', border_style = 'red', width=60)
+            console.print(Panel(f'[bold red]Nenhum item registrado para {usuario}.[/bold red]', border_style = 'red', width=60))
 
         while True:
             console.print('\n[bold yellow]X[/bold yellow] - Voltar')

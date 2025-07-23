@@ -1,5 +1,5 @@
-Breno Jansen, breno.jansen@ufrpe.br, jansen20
-Breno Accioly, brenojaccioly@gmail.com, breno333
+Breno Jansen,breno.jansen@ufrpe.br,jansen20
+Breno Accioly,brenojaccioly@gmail.com,breno333
 
 
 João Guilherme,jgsa1502@gmail.com,jaoteste,
