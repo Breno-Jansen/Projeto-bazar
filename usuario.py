@@ -844,7 +844,7 @@ class Usuario:
                 break
 
         if encontrou:
-            panel = Panel(conteudo, title=f'Extrato do usuário: {usuario}', border_style='green')
+            panel = Panel(conteudo, title=f'Extrato do usuário: {usuario}', border_style='green', width=60)
             console.print(panel)
         else:
             console.print(f'[bold red]Nenhum item registrado para {usuario}.[/bold red]', border_style = 'red', width=60)

@@ -1,5 +1,6 @@
 from rich.console import Console
 from rich.panel import Panel
+from rich.align import Align
 import time
 
 console = Console()
@@ -70,26 +71,59 @@ class Item:
         from menu import Menu
 
         Menu.LimparTerminal()
-        console.print(Panel("❌ Arquivo de itens não encontrado.", border_style="red", width=60))
+        console.print(Panel('[bold white]Aqui você poderá lançar itens ao Bazar Brejó[/bold white]\n[cyan]Digite "cancelar" para sair a qualquer momento.[/cyan]', title= '[bold white]🛍️ LANÇAR ITEM[/bold white]', border_style='purple', width=60))
         nome = input('Nome do item: ').strip()
+        if nome.lower() == 'cancelar':
+            console.print(Align.center(Panel('❌ [red]Operação cancelada.[/red]', width=40, border_style='red')))
+            time.sleep(1.5)
+            return Menu().MenuPrincipal(usuario)
+    
         descricao = input('Descrição do item: ').strip()
+        if descricao.lower() == 'cancelar':
+            console.print(Align.center(Panel('❌ [red]Operação cancelada.[/red]', width=40, border_style='red')))
+            time.sleep(1.5)
+            return Menu().MenuPrincipal(usuario)
 
         while True:
+            tabela = (
+                '1 - Péssimo\n'
+                '2 - Ruim\n'
+                '3 - Regular\n'
+                '4 - Bom\n'
+                '5 - Excelente'
+            )
+            console.print(Panel(tabela, title = '[bold white]GUIA DO ESTADO DE CONSERVAÇÃO[/bold white]', border_style = 'purple', width = 60))
             estado = input('Estado do item (1 a 5): ').strip()
+            
+            if estado.lower() == 'cancelar':
+                console.print(Align.center(Panel('❌ [red]Operação cancelada.[/red]', width=40, border_style='red')))
+                time.sleep(1.5)
+                return Menu().MenuPrincipal(usuario)
+            
             if estado.isdigit() and 1 <= int(estado) <= 5:
                 break
             console.print(Panel("❌ Estado inválido. Digite um número entre 1 e 5.", border_style="red", width=60))
 
         while True:
-            preco = input('Preço (R$): ').strip().replace(',', '.')
+            console.print(Panel('💰 [bold yellow]Modelo de preço: R$ 20,00[/bold yellow]', width=50, border_style='purple'))
             try:
-                float(preco)
+                preco_str = input('Digite o preço (ex: 15.50 ou 15,50): R$ ').strip().replace(',', '.')
+                if preco_str.lower() == 'cancelar':
+                    console.print(Align.center(Panel('❌ [red]Operação cancelada.[/red]', width=40, border_style='red')))
+                    time.sleep(1.5)
+                    return Menu().MenuPrincipal(usuario)
+                preco = float(preco_str)
+                if preco < 0:
+                    console.print("[red]O preço não pode ser negativo.[/red]")
+                    continue
+
+                preco_formatado = f'{preco:.2f}'.replace('.', ',')
                 break
             except ValueError:
-                console.print(Panel("❌ Preço inválido. Digite um valor numérico.", border_style="red", width=60))
+                console.print(Panel("❌ Preço inválido. Digite um valor numérico, como 19.99", border_style="red", width=60))
 
         # Criar instância do item e salvar
-        item = cls(nome, preco, estado, descricao, usuario)
+        item = cls(nome, preco_formatado, estado, descricao, usuario)
         item.SalvarItem()
 
     @staticmethod

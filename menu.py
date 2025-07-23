@@ -200,7 +200,7 @@ class Menu:
             )
             painel = Panel(texto, title = titulo, width = painel_width, border_style='purple')
             console.print(painel)
-            resposta_mc = Prompt.ask('[bold white]Digite a opção desejada: [/bold white]').strip().lower()
+            resposta_mc = Prompt.ask('[bold white]Digite a opção desejada[/bold white]').strip().lower()
 
             if resposta_mc == '1':
                 self.LimparTerminal()
