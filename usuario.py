@@ -107,8 +107,8 @@ class Usuario:
         '''
         from menu import Menu
 
-        email_remetente = "brenojaccioly@gmail.com" # Meu email
-        senha_app = "hdygauzqbboamert" 
+        email_remetente = "brejobazar@gmail.com" # Email do Bazar
+        senha_app = "jhmyndogxbocnswg" 
         # Conteúdo do email
         msg = MIMEMultipart()
         msg["Subject"] = f"{assunto}"
@@ -245,13 +245,13 @@ class Usuario:
             nome_cd = input('Nome: ').strip()
             # Apenas letras(maiúsculas/minúsculas com acentos) e espaços (mínimo duas letras e max 80 letras)
             if not re.fullmatch(r'[A-Za-zÀ-ÿ ]{2,50}', nome_cd):
-                console.print(Panel('[bold red]❌ Nome inválido. Use apenas letras e espaços (mínimo 2 letras).[/bold red]'), border_style='red', width=60)
+                console.print(Panel('[bold red]❌ Nome inválido. Use apenas letras e espaços (mínimo 2 letras).[/bold red]', border_style='red', width=60))
 
             # Checar se nome já é cadastrado
             with open('bancodedados.txt', 'r') as arquivo:
                 usuarios = arquivo.read()
             if nome_cd in usuarios:
-                console.print(Panel('[bold red]❌ Esse nome já foi usado. Tente outro.[/bold red]', vertical="middle"), border_style='red', width=60)
+                console.print(Panel('[bold red]❌ Esse nome já foi usado. Tente outro.[/bold red]',border_style='red', width=60))
             else:
                 Menu.LimparTerminal()
                 return nome_cd
@@ -276,18 +276,52 @@ class Usuario:
             if len(email_arroba) == 2 and (email_cd.endswith('@ufrpe.br') or email_cd.endswith('@gmail.com')):
                 Menu.LimparTerminal()
                 console.print('[bold green]E-mail válido[/bold green]')
+                time.sleep(1.5)
                 # Checar se usuário já é cadastrado
                 with open('bancodedados.txt', 'r') as arquivo:
                     usuarios = arquivo.read()
                 if email_cd in usuarios:
                     Menu.LimparTerminal()
-                    console.print(Panel(Align.center('[bold red]❌ E-mail já cadastrado. Insira outro e-mail![/bold red]', vertical="middle"), border_style='red', width=60))
+                    console.print(Panel('[bold red]❌ E-mail já cadastrado. Insira outro e-mail![/bold red]', border_style='red', width=60))
+                    time.sleep(1.5)
                 else:
                     Menu.LimparTerminal()
-                    return email_cd
+                    console.print(Panel("[bold green]📨 Enviando código...[/bold green]", border_style="green", width=60))
+                    time.sleep(1.5)
+                    codigo =  random.randint(100000,999999) 
+                    conteudo = (f"Olá! Seu código de verificação é: {codigo}")
+                    self.EnviarEmail(email_cd, None, None, 'Mensagem do Bazar Brejó!', conteudo)
+                    while True:
+                        Menu.LimparTerminal()
+                        console.print(Panel(Align.center("Digite o código enviado para seu e-mail"), title="📩 CÓDIGO DE VERIFICAÇÃO", border_style="purple", width=60))
+                        codigo_input = input('Código: ').strip()
+                        if codigo_input == str(codigo):
+                            console.print(Panel("[bold green]✅ Código correto![/bold green]", border_style="green", width=60))
+                            time.sleep(1.5)
+                            Menu.LimparTerminal()
+                            return email_cd
+                        else:
+                            while True:
+                                console.print(Panel("[bold red]❌ Código incorreto. Tente novamente.[/bold red]\n1 - Tentar novamente\n2 - Reenviar código\n3 - Editar e-mail", border_style="red", width=60))
+                                escolha = input('Sua escolha: ').strip()
+                                if escolha == '1':
+                                    break
+                                elif escolha == '2':
+                                    Menu.LimparTerminal()
+                                    self.EnviarEmail(email_cd, None, None, 'Mensagem do Bazar Brejó!', conteudo)
+                                    break
+                                elif escolha == '3':
+                                    Menu.LimparTerminal()
+                                    return self.CadastroUsuario()
+                                else:
+                                    console.print(Panel('[bold red]❌ Opção inválida. Tente novamente[/bold red]', border_style = 'red', width=60))
+                                    time.sleep(1)
+                            
+                            
+                            
             else:
                 Menu.LimparTerminal()
-                console.print(Panel(Align.center('[bold red]❌ E-mail inválido.[/bold red]\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', vertical="middle"), border_style='red', width=60))
+                console.print(Panel('[bold red]❌ E-mail inválido.[/bold red]\n[white]Aceito apenas @gmail.com ou @ufrpe.br[/white]', border_style='red', width=60))
 
     def CadastroSenha(self):
         '''
@@ -330,6 +364,7 @@ class Usuario:
         opcao_cd_numero = input('Digite: ')
         if opcao_cd_numero == '1':
             while True:
+                Menu.LimparTerminal()
                 console.print(Panel(Align.center('Digite seu Whatsapp com DDD, apenas números.\nExemplo: 81999999999', vertical="middle"), title='📞 Número de Whatsapp', border_style='purple', width=60))
                 numero_cd = input('Número: ').strip()
                 # Restricões do tamanho do número. Padrão (81) 912341234
@@ -381,6 +416,7 @@ class Usuario:
         from menu import Menu
         
         while True:
+            Menu.LimparTerminal()
             console.print(Panel(Align.center("Digite seu e-mail para recuperar a senha"), title="🔑 ESQUECI MINHA SENHA", border_style="purple", width=60))
             email_log = input('E-mail: ').strip()
 
@@ -388,6 +424,7 @@ class Usuario:
             with open('bancodedados.txt', 'r') as arquivo:
                 txt = arquivo.read()
             if email_log in txt:
+                Menu.LimparTerminal()
                 console.print(Panel("[bold green]📨 Usuário encontrado. Enviando código...[/bold green]", border_style="green", width=60))
                 time.sleep(1.5)
                 codigo =  random.randint(100000,999999) 
@@ -403,8 +440,21 @@ class Usuario:
                         self.MudarSenhaEsqueci(email_log)
                         return codigo_input and email_log
                     else:
-                        console.print(Panel("[bold red]❌ Código incorreto. Tente novamente.[/bold red]", border_style="red", width=60))
-                        time.sleep(1.5)
+                        while True:
+                                console.print(Panel("[bold red]❌ Código incorreto. Tente novamente.[/bold red]\n1 - Tentar novamente\n2 - Reenviar código\n3 - Editar e-mail", border_style="red", width=60))
+                                escolha = input('Sua escolha: ').strip()
+                                if escolha == '1':
+                                    break
+                                elif escolha == '2':
+                                    Menu.LimparTerminal()
+                                    self.EnviarEmail(email_log, None, None, 'Mensagem do Bazar Brejó!', conteudo)
+                                    break
+                                elif escolha == '3':
+                                    Menu.LimparTerminal()
+                                    return self.CadastroUsuario()
+                                else:
+                                    console.print(Panel('[bold red]❌ Opção inválida. Tente novamente[/bold red]', border_style = 'red', width=60))
+                                    time.sleep(1)
                     
             else:
                 Menu.LimparTerminal()
