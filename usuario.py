@@ -234,19 +234,24 @@ class Usuario:
             Nessa função o nome do usuario é a entrada que vai ser retornada ao cadastro.
             Antes de retornar, confere se o nome já está em uso lendo o bancodedados.txt.
             Se nome já está cadastrado repete o input para nova entrada.
+            E se atenta as restrições de apenas letras e espaços.
 
         '''
         from menu import Menu
-        
+        import re
 
-        console.print(Panel(Align.center('Digite seu nome', title = '📝 CADASTRO DE NOME', border_style = 'purple', width=60)))
+        console.print(Panel('Digite seu nome', title = '📝 CADASTRO DE NOME', border_style = 'purple', width=60))
         while True:
             nome_cd = input('Nome: ').strip()
+            # Apenas letras(maiúsculas/minúsculas com acentos) e espaços (mínimo duas letras e max 80 letras)
+            if not re.fullmatch(r'[A-Za-zÀ-ÿ ]{2,50}', nome_cd):
+                console.print(Panel('[bold red]❌ Nome inválido. Use apenas letras e espaços (mínimo 2 letras).[/bold red]'), border_style='red', width=60)
+
             # Checar se nome já é cadastrado
             with open('bancodedados.txt', 'r') as arquivo:
                 usuarios = arquivo.read()
             if nome_cd in usuarios:
-                console.print(Panel(Align.center('[bold red]❌ Esse nome já foi usado. Tente outro.[/bold red]', vertical="middle"), border_style='red', width=60))
+                console.print(Panel('[bold red]❌ Esse nome já foi usado. Tente outro.[/bold red]', vertical="middle"), border_style='red', width=60)
             else:
                 Menu.LimparTerminal()
                 return nome_cd
