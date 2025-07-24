@@ -107,4 +107,4 @@ https://drive.google.com/drive/folders/16iCAubcMO1BJ_iGQd1I340bP0zMBaLtx?usp=dri
 
 ## 👨‍💻 Desenvolvedores  
 - **João Guilherme Soares de Araujo:** aluno do 1º período de BSI - UFRPE  
-- **Breno Jansen Accyoli:** aluno do 1º período de BSI - UFRPE
+- **Breno Jansen Accioly:** aluno do 1º período de BSI - UFRPE
