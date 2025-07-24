@@ -99,22 +99,6 @@ Para executar o Bazar Brejó corretamente, é necessário instalar as dependênc
 
    Se aparecer a versão da biblioteca, significa que está tudo certo!
 
----
-
-**Dica:** Para facilitar, você pode criar um arquivo `requirements.txt` com o conteúdo:
-
-```
-rich
-```
-
-Depois, qualquer pessoa poderá instalar todas as dependências com:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
 ## 📄 Licença  
 Sem licença definida.
 
