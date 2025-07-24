@@ -190,6 +190,7 @@ class Item:
 
             index = int(escolha) - 1
             item_selecionado = itens[index]
+            preco_float = float(item_selecionado.preco.replace(',','.'))
             Menu.LimparTerminal()
             while True:
                 console.print(Panel(f"[bold]{item_selecionado.nome}[/bold]\n[dim]{item_selecionado.descricao}\nEstado: {item_selecionado.estado}   Preço: R${item_selecionado.preco}", title="📦 DETALHES DO ITEM", border_style="purple", width=60))
@@ -206,7 +207,6 @@ class Item:
                                     console.print(Panel("📧 Email enviado! Venha para o Ceagri II para pegar seu item.", border_style="green", width=60))
                                     # Registra no extrato
                                     try:
-                                        preco_float = float(item_selecionado.preco.replace(',','.'))
                                         classe_usuario.RegistrarCompra(usuario, item_selecionado.nome, preco_float)
                                         # Remove do arquivo listadeitens.txt
                                         Item.RemoverItemDoArquivo(item_selecionado.nome)
@@ -220,17 +220,58 @@ class Item:
                                 else:
                                     Menu.LimparTerminal()
                                     console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
+                        elif escolha == '2':
+                            while True:
+                                console.print(Panel(f'Calculo do troco = seu dinheiro(Ex: nota de 100) - preço({preco_float}) \
+\nPara calcularmos o seu troco, nos fale quanto dinheiro físico você vai dar?', title="💸 TROCO", border_style="purple", width=80))
+                                print(' ')
+                                try:
+                                    dinheiro_comprador = float(input('R$: ').replace(',','.'))
+                                    troco = dinheiro_comprador - preco_float
+                                    if dinheiro_comprador > preco_float:
+                                        print(f'Seu troco vai ser {round(troco, 2)} reais! Vá para o Ceagri II buscar seu item e seu troco :)')
+                                        # Registra no extrato
+                                        try:
+                                            classe_usuario.RegistrarCompra(usuario, item_selecionado.nome, preco_float)
+                                            # Remove do arquivo listadeitens.txt
+                                            Item.RemoverItemDoArquivo(item_selecionado.nome)
+                                        except Exception as e:
+                                            console.print(Panel(f"Erro ao registrar no extrato: {e}", border_style="red", width=60))
+                                        input('Aperte Enter para voltar')
+                                        return menu_global.MenuPrincipal(usuario)
+                                        
+                                    elif dinheiro_comprador == preco_float:
+                                        print(f'Perfeito! Nem vai precisar de troco. Vá para o Ceagri II buscar seu item e seu troco :)')
+                                        input('Aperte Enter para voltar')
+                                        # Registra no extrato
+                                        try:
+                                            classe_usuario.RegistrarCompra(usuario, item_selecionado.nome, preco_float)
+                                            # Remove do arquivo listadeitens.txt
+                                            Item.RemoverItemDoArquivo(item_selecionado.nome)
+                                        except Exception as e:
+                                            console.print(Panel(f"Erro ao registrar no extrato: {e}", border_style="red", width=60))
+                                        input('Aperte Enter para voltar')
+                                        return menu_global.MenuPrincipal(usuario)
+                                        
+                                    else: 
+                                        print(f'Dinheiro insuficiente. O preço do item é {preco_float}')
+                                except:
+                                    console.print(Panel("❌ Digite o valor do seu dinheiro (número).", border_style="red", width=60))
+                              
+                        elif escolha == '3':    
+                            Menu.LimparTerminal()
+                            return menu_global.MenuPrincipal(usuario)  
                         else:
-                            menu_global.MenuPrincipal()    
-                            break  
+                            Menu.LimparTerminal()
+                            console.print(Panel("❌ Opção inválida.", border_style="red", width=60))  
                         break 
                 elif opcao == '2':
                     Item.Negociar(usuario, item_selecionado)
                     break
                 elif opcao == '3':
                     Menu.LimparTerminal()
-                    menu_global.MenuPrincipal(usuario)
-                    break
+                    return menu_global.MenuPrincipal(usuario)
+                    
                 else:
                     Menu.LimparTerminal()
                     console.print(Panel("❌ Opção inválida.", border_style="red", width=60))
