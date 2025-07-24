@@ -166,10 +166,9 @@ class Item:
         """
         from sistema import menu_global
         from menu import Menu
-        from usuario import Usuario
-        usuario_obj = Usuario()
         itens = Item.CarregarItens()
-
+        from usuario import Usuario
+        classe_usuario = Usuario()
         if not itens:
             console.print(Panel("❌ Nenhum item disponível.", border_style="red", width=60))
             time.sleep(1.5)
@@ -208,14 +207,11 @@ class Item:
                                     # Registra no extrato
                                     try:
                                         preco_float = float(item_selecionado.preco.replace(',','.'))
-                                        usuario_obj.RegistrarCompra(usuario, item_selecionado.nome, preco_float)
-                                    except Exception as e:
-                                        console.print(Panel(f"Erro ao registrar no extrato: {e}", border_style="red", width=60))
-                                    # Remove do arquivo listadeitens.txt
-                                    try:
+                                        classe_usuario.RegistrarCompra(usuario, item_selecionado.nome, preco_float)
+                                        # Remove do arquivo listadeitens.txt
                                         Item.RemoverItemDoArquivo(item_selecionado.nome)
                                     except Exception as e:
-                                        console.print(Panel(f"Erro ao remover item: {e}", border_style="red", width=60))  
+                                        console.print(Panel(f"Erro ao registrar no extrato: {e}", border_style="red", width=60))
                                     return menu_global.MenuPrincipal(usuario)    
                                 elif confirmar == '2':
                                     Menu.LimparTerminal()
